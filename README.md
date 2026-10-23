@@ -1,7 +1,8 @@
 # RSNA Knee: complementary models, explicit limits
 
-**Local publication draft — not published. Release requires the author's explicit
-approval after 23 October 2026. Final scores updated on 23 October 2026.**
+**Project page: https://tumerkaan.github.io/rsna-knee-mri-2026/** · Kaggle write-up: [discussion 751999](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/discussion/751999)
+
+Tümer Kaan Mutlu, solo entry. Published 23 October 2026 after the competition ended.
 
 A research account of study-level knee MRI classification with weak labels:
 three own model families, an openly attributed public ensemble, and the engineering
@@ -15,7 +16,7 @@ needed to return a valid prediction under a fixed runtime budget.
 Final selections were verified on 20 October. These are rounded leaderboard scores,
 not evidence that every hidden case used every model.
 
-- [Project page](docs/index.html) · [Full writeup](docs/WRITEUP.md)
+- [Project page](https://tumerkaan.github.io/rsna-knee-mri-2026/) · [Full writeup](docs/WRITEUP.md)
 - [Kaggle discussion draft](docs/KAGGLE_DISCUSSION.md) · [Reproduction](REPRODUCE.md)
 - [Attribution and external data](ATTRIBUTION.md) · [Evidence](docs/EVIDENCE.md)
 - [Aggregate results](results/) · [Release policy](RELEASE_POLICY.md)

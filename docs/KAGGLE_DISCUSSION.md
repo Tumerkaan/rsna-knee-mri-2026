@@ -1,7 +1,6 @@
 # What helped, what failed, and what we could safely finish
 
-*Post-competition draft. Do not publish before author approval after 23 October.
-Final scores were supplied by the author on 23 October 2026.*
+*Long-form version. The shorter post is on Kaggle: [discussion 751999](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/discussion/751999). Final scores from 23 October 2026.*
 
 Our final selections were **Final blend (57406719)**, a robust nested blend of
 the public ensemble (goodpjw2008) and our models, and **Own models only (57406173)**. Their public scores were **0.958** and **0.947**, respectively.

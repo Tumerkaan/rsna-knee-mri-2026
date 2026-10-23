@@ -1,4 +1,4 @@
-# Local release candidate — not published
+# Release policy
 
 - Updated on 23 October 2026. Publication requires separate explicit author approval.
   No push, repository creation, Kaggle post or Pages deployment is authorized here.
