@@ -1,0 +1,32 @@
+[
+  {
+    "source": "output/jupyter-notebook/gz-20261020/g-f0/G-Fold0-20261020.ipynb",
+    "sha256": "9fc1cf783f27076632279ff5d5e34a0d3a95389e549840edcdd77b7cf4ae44a1",
+    "purpose": "code-only extraction"
+  },
+  {
+    "source": "output/jupyter-notebook/gz-20261020/z-f0/Z-Fold0-20261020.ipynb",
+    "sha256": "4173895dfdf305e5d6de94950dc58307dab31bd803120edef807bb7a800aac62",
+    "purpose": "code-only extraction"
+  },
+  {
+    "source": "output/jupyter-notebook/abig-t1-fivefold-20261016/analysis.json",
+    "sha256": "2e9fffdbc841d31040978fc121cad0d2c9668426e91c7917bd27725b19a261c8",
+    "purpose": "aggregate extraction"
+  },
+  {
+    "source": "output/jupyter-notebook/f-family-20261016/fold01-evaluation-20261017/analysis.json",
+    "sha256": "84712652d2aea026455e7c98fce3cb5ba9be52481c71c03ff09e78080be3658b",
+    "purpose": "aggregate extraction"
+  },
+  {
+    "source": "output/jupyter-notebook/gz-20261020/host-gate/decision.json",
+    "sha256": "813c48089ada309019d566f8c12a071c086da13165e342ef6d49c773e1b3c605",
+    "purpose": "aggregate extraction"
+  },
+  {
+    "source": "output/jupyter-notebook/gz-20261020/z-gate-20261020/decision.json",
+    "sha256": "ee808860cc911dee006fd641580f720c45b9bbbaa06a4f9004bed501a4068125",
+    "purpose": "aggregate extraction"
+  }
+]

@@ -1,0 +1,11 @@
+date,submission,model,public_auc,status,final_slot,private_auc
+2026-10-16,57244604,A + T,0.946,COMPLETE,,
+2026-10-16,57245387,public ensemble (goodpjw2008),0.956,COMPLETE,,
+2026-10-16,57265014,public ensemble (goodpjw2008) nested w=.20,0.956,COMPLETE,,
+2026-10-16,57274417,public ensemble (goodpjw2008) nested w=.30,0.956,COMPLETE,,
+2026-10-18,57321362,public ensemble (goodpjw2008) alone,0.958,COMPLETE,,0.942
+2026-10-18,57321998,public ensemble (goodpjw2008) + A + T w=.30,0.957,COMPLETE,,
+2026-10-18,57354256,Own A + T + F first attempt,,ERROR,,
+2026-10-18,57354270,public ensemble (goodpjw2008) + A + T + F first attempt,,ERROR,,
+2026-10-19,57406173,Own models only,0.947,COMPLETE,2,0.928
+2026-10-20,57406719,Final blend,0.958,COMPLETE,1,0.942

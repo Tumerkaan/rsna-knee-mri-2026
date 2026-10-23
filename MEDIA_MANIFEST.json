@@ -1,0 +1,223 @@
+{
+  "schema": "ILLUSTRATION_ALLOWLIST_V1",
+  "review_date": "2026-10-23",
+  "purpose": "External illustrations only; not competition images or training inputs",
+  "files": [
+    {
+      "path": "docs/assets/commons/axial_full.png",
+      "sha256": "84929328937d1c027403b45cac0f9fd55b63fbc5a49ad8135310041a1feb9341",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/axial_rgb.png",
+      "sha256": "2da6151a738fbeba375e4296c8dfec3cd2823612f620068ca56e3a119c62e602",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/axial_sq.png",
+      "sha256": "29aa6b70931ef9a758ec74b0a37ce03b9d7abdab11d5aa82b11f2970f2d83dcd",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/axial_sq_flip.png",
+      "sha256": "053fa7a0a2f54ac50cba8e4ade8b008227fa30d2ba35c1e076790f57564470db",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/axial_sq_zm1.png",
+      "sha256": "a0bac2c030408a58dd07b84b10456dde8f9b5e1300a90b3d1f47e28768b66e40",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/axial_sq_zp1.png",
+      "sha256": "fb0a17f3f83490c851a6dca53ade71a820901860f66ab14f443012bfa1b33e69",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/coronal_sq.png",
+      "sha256": "894fc7543158131a1b33410167b6ecf16875b9778209463ba9c524365080546a",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_t2_tse_fs_cor_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/coronal_sq_flip.png",
+      "sha256": "913b1bb7f54c0000054350ae34fe35491c8842c553ad9fd58dcd00383c56f50c",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_t2_tse_fs_cor_320.ogg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/cor_other_sq.png",
+      "sha256": "bb2e6c5c6dd5e57cd75e2924333d530dc0b31794f995f47e248f7612cc8ae2c7",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/commons/sag_other_sq.png",
+      "sha256": "5269deeacfd1c7c6a0e057537f8affd84a5d7d281310a9dbd7627ad5c050e287",
+      "source": "https://commons.wikimedia.org/wiki/File:Knee_MRI_T1_TSE_Sagittal.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Ptrump16",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/crop/scan1_full.png",
+      "sha256": "b9d2784df670a811a60ce1fd7377ed9af967045b805242f70b56b950e9e4afda",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/crop/scan1_mm.png",
+      "sha256": "f47fd91eb1996350aca1ec73e11c9243ebca6c3fc010195911c748fdf81c0da6",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/crop/scan1_px.png",
+      "sha256": "6df8a4b33d78fcd8cef2dce343531cafb1dc4c4d4dc4231475e2b9bcc9f11235",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/crop/scan2_full.png",
+      "sha256": "14f24735e334f269787bca0519f0d2e8249672a545eea0ade26208a1131a2017",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/crop/scan2_mm.png",
+      "sha256": "45e57832d14c9b0fffef911ee2daeb61b1096dbea41c7d5979769dc095c0df6f",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/crop/scan2_px.png",
+      "sha256": "9cd855f29d54b69069f4aa102e229611f4ddfd5c1e1cb2f2c1ba2b72ceb5be41",
+      "source": "https://doi.org/10.17632/xw7mrg7ntg.6",
+      "license": "CC BY 4.0",
+      "author": "Yuting Wang and Feng Shi",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/series_1.png",
+      "sha256": "e428af1bab476ca6fdccd35fb199858c868418511a6e6318f1327712188cece7",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/series_2.png",
+      "sha256": "34b9ca995e7420a93b70a2a8618292a683c23a5b362f8950bb3c4dccb71716f2",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/series_3.png",
+      "sha256": "d9d3bc2cbb23428d93318df19e8436650d6474f2e6b771edea2207ed44605b1e",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/series_4.png",
+      "sha256": "74beb3328327c3fe68d66ffbcb1f2f84514baf3122568f610aa20b999994dcf8",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/series_5.png",
+      "sha256": "8317483b07d339ea8fed8e0883d3bc76e295810e6174b6d19def068b95e035f3",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/slice_z.png",
+      "sha256": "d9d3bc2cbb23428d93318df19e8436650d6474f2e6b771edea2207ed44605b1e",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/slice_zm1.png",
+      "sha256": "7ffe838db87e9975b72988f617e90e59524b5412e4b73777767cb417d5706c8a",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    },
+    {
+      "path": "docs/assets/kneemri/slice_zp1.png",
+      "sha256": "7b3b45aafcedae0a46e3283bd7371d01ae705b77ea38d07c20a5a70ad8fa8f04",
+      "source": "https://zenodo.org/records/14789903",
+      "license": "CC BY-NC-ND 4.0",
+      "author": "Clinical Hospital Centre Rijeka; Stajduhar et al.",
+      "attribution": "ATTRIBUTION.md",
+      "source_note": "docs/assets/commons/SOURCES.md"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "scope": "Provenance hashes only; private source artifacts are excluded.",
+  "sources": [
+    {
+      "evidence": "N1",
+      "source_basename": "verified-commit.json",
+      "sha256": "cbf35d0dff6cbe22642e3ac7ac17e5fb20efd55fd98b63e91ca478f948883423"
+    },
+    {
+      "evidence": "N2",
+      "source_basename": "verified-commit.json",
+      "sha256": "8a2280b64f22c0604941cf6005006bada133cb650c56de935cb37c314f2c5d3c"
+    },
+    {
+      "evidence": "N3",
+      "source_basename": "verified-parity.json",
+      "sha256": "0213141ff32aff77058836be6d1bea21d97e5f0c955b2da520947550310c374e"
+    },
+    {
+      "evidence": "N4",
+      "source_basename": "user-stop-final-20261020.json",
+      "sha256": "f31ee96d360b083ae146f41b8d049fb003caf054891cb14bb1959cbb03bfe97d"
+    },
+    {
+      "evidence": "N5",
+      "source_basename": "measurement-analysis.json",
+      "sha256": "bbda0a12a980dbab4e8bec22737528f37a2a3b95ef1436b3b68e510462d15f01"
+    },
+    {
+      "evidence": "N6",
+      "source_basename": "observed-result.json",
+      "sha256": "78887d79251786b903c8a07ca72d367d7b26d17ea4102fbc75122e602467d3cd"
+    },
+    {
+      "evidence": "N7",
+      "source_basename": "S6-WRITEUP-NOTU-20261020.md",
+      "sha256": "869d6cd811931afa204a2c567eb6e804fe6648b55337e5ff5f29f10cc1656f78"
+    },
+    {
+      "evidence": "N8",
+      "source_basename": "PUBLIC-TABAN-V27-VE-FINAL-STRATEJI-20261017.md",
+      "sha256": "cffcffb304d309f7b085ab3b4ba6c5235c13005463aec62eb8cd650f5c46514e"
+    }
+  ]
+}

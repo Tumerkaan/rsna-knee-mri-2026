@@ -1,0 +1,30 @@
+{
+  "volumes": {
+    "path": "private-input/volumes.npy",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  },
+  "masks": {
+    "path": "private-input/masks.npy",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  },
+  "labels": {
+    "path": "private-input/labels.npy",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  },
+  "silent": {
+    "path": "private-input/silent.npy",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  },
+  "folds": {
+    "path": "private-input/folds.npy",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  },
+  "ids": {
+    "path": "private-input/ids.npy",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  },
+  "initial_weights": {
+    "path": "private-input/initial_weights.safetensors",
+    "sha256": "REPLACE_WITH_VERIFIED_SHA256"
+  }
+}

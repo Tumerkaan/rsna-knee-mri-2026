@@ -1,0 +1,11 @@
+RSNA Knee Ensemble — local publication draft
+Copyright 2026 the project contributors.
+
+The original project code in this package is licensed under Apache-2.0.
+See ATTRIBUTION.md for upstream methods, public inference sources, datasets,
+and their distinct licensing and provenance boundaries. Referenced third-party
+data, model weights and public inference source packages are not redistributed
+by this archive. Mentioning a source does not relicense it under Apache-2.0.
+
+Historical aggregate results do not establish GPU parity for the newly
+packaged local input/output adapters.

@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A solo entry to the RSNA Knee Abnormality Detection challenge on Kaggle: a 2.5D multiple-instance model for twelve knee MRI findings, explained step by step.">
+<meta name="robots" content="noindex,nofollow">
+<title>Knee MRI Abnormality Detection — RSNA 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');try{const t=localStorage.getItem('rsna-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>
+:root{--bg:#f3f6f5;--panel:#ffffff;--ink:#0f2329;--soft:#3d5560;--muted:#7a8c93;--line:#d9e2e1;--teal:#0b7a75;--teal-soft:rgba(11,122,117,.08);--amber:#b7790b;--amber-soft:rgba(183,121,11,.09);--plum:#5f4b9c;--plum-soft:rgba(95,75,156,.08);--red:#b4413a;--red-soft:rgba(180,65,58,.08);--code:#0f2329;
+--c-a:#0b7a75;--c-t:#5f4b9c;--c-f:#b7790b;--c-at:#7f98a1;--c-atf:#0f2329;--c-z:#b4413a;
+--serif:'Fraunces',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;--r:12px;--shadow:0 1px 2px rgba(15,35,41,.04),0 8px 24px rgba(15,35,41,.05)}
+:root[data-theme="dark"]{--bg:#0b1619;--panel:#112128;--ink:#e6eff0;--soft:#a7bbc1;--muted:#6f878f;--line:#1f353d;--teal:#3cbfb6;--teal-soft:rgba(60,191,182,.1);--amber:#e3ad48;--amber-soft:rgba(227,173,72,.1);--plum:#a691e3;--plum-soft:rgba(166,145,227,.1);--red:#e57a72;--red-soft:rgba(229,122,114,.1);--code:#071013;--c-a:#3cbfb6;--c-t:#a691e3;--c-f:#e3ad48;--c-at:#7f98a1;--c-atf:#e6eff0;--c-z:#e57a72;--shadow:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1619;--panel:#112128;--ink:#e6eff0;--soft:#a7bbc1;--muted:#6f878f;--line:#1f353d;--teal:#3cbfb6;--teal-soft:rgba(60,191,182,.1);--amber:#e3ad48;--amber-soft:rgba(227,173,72,.1);--plum:#a691e3;--plum-soft:rgba(166,145,227,.1);--red:#e57a72;--red-soft:rgba(229,122,114,.1);--code:#071013;--c-a:#3cbfb6;--c-t:#a691e3;--c-f:#e3ad48;--c-at:#7f98a1;--c-atf:#e6eff0;--c-z:#e57a72;--shadow:none}}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.72;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--teal);text-decoration:none;border-bottom:1px solid transparent}a:hover{border-bottom-color:currentColor}
+.container{max-width:1120px;margin:0 auto;padding:0 32px}
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--teal);z-index:200;transition:width .1s linear}
+/* nav */
+nav{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--panel) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:4px;height:60px;overflow-x:auto;scrollbar-width:none}
+nav .inner::-webkit-scrollbar{display:none}
+nav .logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:16px;color:var(--ink);margin-right:14px;cursor:pointer;white-space:nowrap;border:none}
+.logo-mark{display:inline-flex;gap:2px}.logo-mark i{width:4px;height:16px;border-radius:2px;background:var(--teal);opacity:.35;transition:background .2s,opacity .2s}nav .logo:hover .logo-mark i{background:var(--ink);opacity:1}.logo-mark i:nth-child(2){opacity:.65}.logo-mark i:nth-child(3){opacity:1}
+nav a{font-size:13px;font-weight:500;color:var(--soft);padding:6px 11px;border-radius:8px;border:none;white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
+nav a:hover{background:var(--teal-soft);color:var(--teal);border:none}
+nav a.active{background:var(--teal);color:#fff}
+:root[data-theme="dark"] nav a.active{color:#0b1619}
+.theme-btn{margin-left:auto;flex-shrink:0;background:none;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}
+.theme-btn:hover{color:var(--teal);border-color:var(--teal);background:var(--teal-soft)}
+/* hero */
+.hero{padding:72px 0 56px;background:radial-gradient(900px 400px at 85% 10%,var(--teal-soft),transparent 70%)}
+.hero-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:center}
+.hero .tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--teal);margin-bottom:22px;letter-spacing:.02em}
+.hero .tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px var(--teal-soft)}
+.hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.1rem,4.6vw,3.3rem);line-height:1.08;letter-spacing:-.02em;margin-bottom:22px}
+.hero h1 em{font-style:italic;font-weight:400;color:var(--teal)}
+.hero .subtitle{font-size:17px;color:var(--soft);margin-bottom:28px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:13px;color:var(--soft);background:var(--panel);border:1px solid var(--line);padding:5px 12px;border-radius:8px}
+.chip.draft{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 40%,transparent);background:var(--amber-soft)}
+.hero-art{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.hero-art svg{width:100%;height:auto;display:block}
+.cap-mono{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:10px;text-align:center}
+/* stats */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);margin:8px 0 40px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.stat-card{padding:24px 24px 22px;border-right:1px solid var(--line);transition:background .2s}
+.stat-card:hover{background:var(--teal-soft)}
+.stat-card:last-child{border-right:none}
+.stat-card .num{font-family:var(--serif);font-weight:600;font-size:2.3rem;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.stat-card .num::after{content:"";display:block;width:28px;height:3px;border-radius:2px;background:var(--teal);margin-top:12px}
+.stat-card:nth-child(3) .num{color:var(--teal)}
+.stat-card .label{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
+/* story */
+.glance{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:32px 32px 28px;margin:0 0 32px;box-shadow:var(--shadow)}
+.glance h3{font-family:var(--serif);font-weight:600;font-size:1.25rem;margin:0 0 26px}
+.glance-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative}
+.glance-flow::before{content:"";position:absolute;top:15px;left:16px;right:16px;height:2px;background:linear-gradient(90deg,var(--teal-soft),var(--teal))}
+.glance-step{position:relative;border-radius:10px;transition:transform .2s}
+.glance-step:hover{transform:translateY(-3px)}
+.gnum{position:relative;z-index:1;width:32px;height:32px;border-radius:50%;background:var(--panel);border:2px solid var(--teal);color:var(--teal);font-family:var(--mono);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.glance-step:last-child .gnum{background:var(--teal);color:var(--panel)}
+.gkicker{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.gtitle{font-weight:600;font-size:15px;color:var(--ink);margin-bottom:6px}
+.gtext{font-size:13.5px;color:var(--soft);line-height:1.55}
+.gmetric{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--teal);background:var(--teal-soft);padding:2px 8px;border-radius:6px;margin-top:10px}
+/* sections */
+section{padding:76px 0}
+section:nth-of-type(even){background:color-mix(in srgb,var(--panel) 55%,var(--bg))}
+.section-label{display:flex;align-items:baseline;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.section-label .sn{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--teal);letter-spacing:0}
+.section-label::after{content:"";flex:1;height:1px;background:var(--line);transform:translateY(-4px)}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,3vw,2.15rem);line-height:1.2;letter-spacing:-.015em;margin-bottom:20px;max-width:820px}
+h3{font-family:var(--serif);font-weight:600;font-size:1.25rem;margin:44px 0 10px;display:flex;align-items:baseline;gap:10px}
+h3 .step{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--teal);background:var(--teal-soft);padding:2px 8px;border-radius:6px;transform:translateY(-2px)}
+h4{font-size:15px;font-weight:600;margin:20px 0 8px;color:var(--ink)}
+p{color:var(--soft);margin-bottom:16px;max-width:860px}p:last-child{margin-bottom:0}
+.lead{font-size:17.5px;color:var(--soft);max-width:860px}
+em{color:var(--ink)}
+ul,ol{color:var(--soft);padding-left:20px;margin-bottom:16px}li{margin-bottom:6px}
+.rq{display:flex;align-items:center;gap:14px;margin:6px 0 22px;padding:14px 18px;background:var(--plum-soft);border-radius:var(--r)}
+.rq-num{flex-shrink:0;width:34px;height:34px;color:var(--plum);border:2px solid var(--plum);font-family:var(--serif);font-weight:600;font-size:1.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.rq-q{font-family:var(--serif);font-size:1.1rem;font-style:italic;color:var(--ink);flex:1}
+/* figures */
+.fig{margin:22px 0 30px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);transition:box-shadow .2s,border-color .2s}
+.fig:hover{border-color:color-mix(in srgb,var(--teal) 35%,var(--line))}
+.fig svg{width:100%;height:auto;display:block;overflow:visible}
+.fig-caption{font-size:13px;color:var(--muted);margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
+.fig-caption b{font-family:var(--mono);font-weight:500;color:var(--teal);margin-right:6px}
+.fig-tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;align-items:center}
+.fig-tools .lbl{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:4px}
+.tbtn{font-family:var(--sans);font-size:12.5px;font-weight:500;color:var(--soft);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.tbtn:hover{border-color:var(--teal);color:var(--teal)}
+.tbtn.on{background:var(--teal-soft);border-color:var(--teal);color:var(--ink)}
+.tbtn.off{opacity:.45}
+.tbtn .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.illus{display:inline-block;font-family:var(--mono);font-size:10.5px;color:var(--amber);background:var(--amber-soft);border-radius:5px;padding:1px 7px;margin-left:6px;letter-spacing:.03em;vertical-align:middle}
+#tip{position:fixed;pointer-events:none;z-index:500;background:var(--ink);color:var(--bg);font-size:12.5px;line-height:1.45;padding:7px 10px;border-radius:8px;opacity:0;transition:opacity .12s;max-width:260px;font-family:var(--sans)}
+#tip b{font-family:var(--mono);font-weight:500}
+.ax text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.ax line,.ax path{stroke:var(--line)}
+.svg-t{font-family:var(--sans);fill:var(--ink)}
+.svg-m{font-family:var(--mono);fill:var(--muted)}
+.hov{cursor:pointer;transition:opacity .15s}
+/* cards and grids */
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.slot{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;transition:transform .2s,border-color .2s}
+.slot:hover{transform:translateY(-3px);border-color:var(--teal)}
+.slot .pl{font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.06em}
+.slot .nm{font-weight:600;font-size:14px;margin:2px 0 8px}
+.slot svg{width:100%;height:auto;aspect-ratio:1}
+.slot.miss{border-style:dashed;background:transparent}
+.slot img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:6px;background:#000}
+.slot .real{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--teal);margin-top:6px}
+.series{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.series figure{margin:0}.series img{width:100%;border-radius:6px;background:#000;cursor:zoom-in}
+.series figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
+.crop-demo{display:grid;grid-template-columns:1.6fr auto 1fr;gap:18px;align-items:center}
+.crop-demo .frame{position:relative;overflow:hidden;border-radius:6px;line-height:0}.crop-demo .frame img,.crop-demo .out img{width:100%;border-radius:6px;background:#000}
+.crop-demo .box{position:absolute;left:21.8%;top:11.3%;width:53.6%;height:71.2%;border:2px dashed var(--amber);border-radius:4px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
+.crop-demo .arrow{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center}
+.crop-demo .cap{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px;text-align:center}
+.merge{display:grid;grid-template-columns:1fr 1fr 1fr auto 1.25fr;gap:10px;align-items:center}
+.merge .eq{font-family:var(--serif);font-size:1.6rem;color:var(--muted);padding:0 4px}
+@media(max-width:700px){.crop-demo{grid-template-columns:1fr}.merge{grid-template-columns:1fr 1fr 1fr}.merge .eq{display:none}.merge figure:last-child{grid-column:1/-1}}
+.scan2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.scan-col h5{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.scan-col h5 span{color:var(--ink);text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:13px;font-weight:600;display:block}
+.scan-full{position:relative;overflow:hidden;border-radius:6px;line-height:0}
+.scan-full img{width:100%;background:#000}
+.scan-full .b{position:absolute;border-radius:3px}
+.scan-full .px{border:2px dashed var(--amber)}
+.scan-full .mm{border:2px solid #3cbfb6}
+.scan-outs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.scan-outs figure{margin:0}.scan-outs img{width:100%;border-radius:6px;background:#000;cursor:zoom-in}
+.scan-outs figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.scan-outs .px img{border-top:3px dashed var(--amber)}.scan-outs .mm img{border-top:3px solid #3cbfb6}
+.crop-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--soft);margin-bottom:14px}
+.crop-legend i{display:inline-block;width:22px;height:0;vertical-align:middle;margin-right:6px}
+@media(max-width:700px){.scan2{grid-template-columns:1fr}}
+.series figure.cur img{outline:3px solid var(--teal);outline-offset:2px}
+.lightbox{display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,18,21,.9);align-items:center;justify-content:center;padding:40px;cursor:zoom-out}.lightbox.open{display:flex}.lightbox img{max-width:92vw;max-height:88vh;border-radius:8px;image-rendering:auto}
+@media(max-width:700px){.series{grid-template-columns:repeat(3,1fr)}}
+.slot.miss .pl{color:var(--muted)}
+.findings-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0}
+.fgroup{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.fgroup .gname{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.fchip{display:block;font-size:13.5px;font-weight:500;color:var(--ink);padding:5px 9px;border-radius:7px;background:var(--teal-soft);margin-bottom:6px;transition:background .15s}
+.fchip:hover{background:color-mix(in srgb,var(--teal) 20%,transparent)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:20px 0}
+.method-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow);transition:transform .2s,border-color .2s}
+.method-card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--teal) 45%,var(--line))}
+.method-card h4{margin-top:0;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.two-col .method-card h4{font-family:var(--serif);font-size:1.05rem;letter-spacing:0;text-transform:none;color:var(--ink)}
+.method-card .big{font-family:var(--serif);font-weight:600;font-size:1.55rem;color:var(--ink);line-height:1.15;margin-bottom:8px}
+.method-card p{font-size:14px}
+.family-card{border-top:4px solid var(--c)}
+.family-card .big{color:var(--c)}
+.family-card dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px;margin-top:10px}
+.family-card dt{font-family:var(--mono);font-size:11.5px;color:var(--muted);padding-top:2px}
+.family-card dd{color:var(--soft)}
+.formula{font-family:var(--mono);font-size:1.02rem;text-align:center;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:var(--r);padding:18px;margin:22px 0;color:var(--ink)}
+.finding{position:relative;border:1px solid color-mix(in srgb,var(--amber) 35%,transparent);background:var(--amber-soft);padding:14px 18px 14px 46px;border-radius:var(--r);margin:16px 0;color:var(--soft);font-size:15px}
+.finding::before{content:"!";position:absolute;left:19px;top:13px;font-weight:600;color:var(--amber)}
+.finding.blue{border-color:color-mix(in srgb,var(--plum) 30%,transparent);background:var(--plum-soft)}.finding.blue::before{content:"i";color:var(--plum);font-family:var(--serif);font-style:italic}
+.finding.green{border-color:color-mix(in srgb,var(--teal) 45%,transparent);background:var(--teal-soft)}.finding.green::before{content:"✓";color:var(--teal)}
+.finding.grey{border-color:var(--line);background:var(--panel)}.finding.grey::before{content:"·";color:var(--muted);font-size:22px;top:6px}
+.finding strong{color:var(--ink)}
+.table-wrap{overflow-x:auto;margin:18px 0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.result-table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.result-table th{background:var(--teal-soft);color:var(--ink);padding:11px 16px;text-align:left;font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.result-table td{padding:10px 16px;border-bottom:1px solid var(--line);color:var(--soft)}
+.result-table tr:last-child td{border-bottom:none}
+.result-table tbody tr{transition:background .15s}
+.result-table tbody tr:hover td{background:var(--teal-soft)}
+.result-table .num{font-family:var(--mono);font-size:13px;color:var(--ink)}
+.result-table td.no{color:var(--red);font-family:var(--mono);font-size:12px}
+.result-table td.stop{color:var(--amber);font-family:var(--mono);font-size:12px}
+.result-table td.yes{color:var(--teal);font-family:var(--mono);font-size:12px}
+pre{background:var(--code);color:#d6e6e8;padding:20px 24px;border-radius:var(--r);font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;margin:18px 0}
+code{font-family:var(--mono);font-size:.88em;background:var(--teal-soft);padding:2px 6px;border-radius:4px;color:var(--teal)}
+pre code{background:none;padding:0;color:inherit}
+.steps{list-style:none;counter-reset:step;padding-left:0;position:relative;margin:8px 0 20px}
+.steps li{counter-increment:step;padding:4px 0 22px 56px;position:relative;color:var(--soft)}
+.steps li::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:2px;width:36px;height:36px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--teal);display:flex;align-items:center;justify-content:center}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:17px;top:42px;bottom:2px;width:2px;background:var(--line)}
+.steps li strong{color:var(--ink)}
+.bridge{display:flex;align-items:flex-start;gap:12px;background:var(--plum-soft);border-radius:var(--r);padding:14px 18px;margin-bottom:24px}
+.bridge .arrow{color:var(--plum);font-size:1.2rem;line-height:1.3;flex-shrink:0}
+.bridge p{margin:0;font-size:14.5px}.bridge strong{color:var(--ink)}
+.pending{border:1.5px dashed color-mix(in srgb,var(--amber) 55%,transparent);border-radius:var(--r);padding:20px 22px;margin-top:26px;background:var(--amber-soft)}
+.pending h4{color:var(--amber);margin-top:0}
+.slider-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.slider-row input{flex:1;min-width:180px;accent-color:var(--teal)}
+.slider-row .val{font-family:var(--mono);font-size:14px;color:var(--teal);min-width:90px}
+.rank-table td.mv-up{color:var(--teal);font-family:var(--mono)}
+.rank-table td.mv-dn{color:var(--red);font-family:var(--mono)}
+.rank-table tr.moved td{background:var(--amber-soft)}
+footer{border-top:1px solid var(--line);background:var(--panel);color:var(--muted);padding:32px 0;font-size:14px}
+footer .inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+footer .who{font-family:var(--serif);font-weight:600;color:var(--ink)}
+.to-top{position:fixed;right:22px;bottom:22px;width:42px;height:42px;border-radius:50%;background:var(--teal);color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90}
+.to-top.show{opacity:1;pointer-events:auto}.to-top:hover{transform:translateY(-3px)}
+/* reveal */
+.js .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.hero-art{max-width:460px}.summary-grid{grid-template-columns:1fr 1fr}.stat-card:nth-child(2){border-right:none}.stat-card:nth-child(-n+2){border-bottom:1px solid var(--line)}.slots,.findings-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.container,footer .inner{padding:0 16px}nav .inner{padding:0 12px}.glance{padding:24px 20px}.glance-flow{grid-template-columns:1fr;gap:20px}.glance-flow::before{top:16px;bottom:16px;left:15px;right:auto;width:2px;height:auto;background:linear-gradient(180deg,var(--teal-soft),var(--teal))}.glance-step{padding-left:48px}.gnum{position:absolute;left:0;top:0}.two-col,.three-col{grid-template-columns:1fr}.slots,.findings-grid{grid-template-columns:1fr 1fr}.hero{padding:44px 0 36px}section{padding:56px 0}.stat-card{padding:18px}.stat-card .num{font-size:1.8rem}.fig{padding:14px}}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<nav>
+  <div class="inner">
+    <span class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="logo-mark"><i></i><i></i><i></i></span>Knee MRI · RSNA 2026</span>
+    <a href="#problem">Problem</a>
+    <a href="#data">Data</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#models">Models</a>
+    <a href="#validation">Validation</a>
+    <a href="#blend">Final blend</a>
+    <a href="#hidden">Hidden run</a>
+    <a href="#didnt">What didn't work</a>
+    <a href="#lessons">Lessons</a>
+    <a href="#code">Code</a>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Light / dark">◐</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="tag">RSNA Knee Abnormality Detection · Kaggle · October 2026</div>
+      <h1>Detecting Twelve <em>Knee Abnormalities</em> from a Single MRI Study</h1>
+      <p class="subtitle">A knee MRI study is not one picture but several stacks of slices, taken in different planes. My models read short stacks of neighbouring slices, let an attention layer decide which ones matter for each finding, and output twelve probabilities — from ACL and meniscus tears to effusion and fractures. This page walks through every step, with the numbers behind each decision.</p>
+      <div class="chips">
+        <span class="chip">Tümer Kaan Mutlu — solo entry</span>
+        <span class="chip">Istanbul Bilgi University · Industrial Engineering</span>
+        <span class="chip draft">Draft · final scores in</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 320 230" fill="none">
+        <g font-family="IBM Plex Mono, monospace" font-size="9">
+          <rect x="18" y="40" width="70" height="86" rx="6" fill="var(--teal-soft)" stroke="var(--line)"/>
+          <rect x="30" y="30" width="70" height="86" rx="6" fill="var(--teal-soft)" stroke="var(--line)"/>
+          <rect x="42" y="20" width="70" height="86" rx="6" fill="var(--panel)" stroke="var(--teal)" stroke-width="1.5"/>
+          <path d="M60 40 q17 18 0 46 M94 40 q-17 18 0 46" stroke="var(--teal)" stroke-width="1.5" opacity=".7"/>
+          <ellipse cx="77" cy="63" rx="8" ry="14" stroke="var(--teal)" opacity=".45"/>
+          <text x="18" y="146" fill="var(--muted)">3-slice stacks ×86</text>
+          <path d="M122 63 h34" stroke="var(--muted)" stroke-dasharray="3 3"/><path d="M152 59 l5 4 -5 4" stroke="var(--muted)"/>
+          <rect x="164" y="38" width="56" height="50" rx="8" fill="var(--panel)" stroke="var(--line)"/>
+          <text x="174" y="60" fill="var(--ink)">CNN /</text><text x="174" y="73" fill="var(--ink)">ViT</text>
+          <path d="M226 63 h20" stroke="var(--muted)" stroke-dasharray="3 3"/><path d="M242 59 l5 4 -5 4" stroke="var(--muted)"/>
+          <text x="254" y="28" fill="var(--muted)">attention</text>
+          <g fill="var(--teal)">
+            <rect x="254" y="36" width="10" height="54" rx="2" opacity=".15"/><rect x="254" y="70" width="10" height="20" rx="2"/>
+            <rect x="268" y="36" width="10" height="54" rx="2" opacity=".15"/><rect x="268" y="48" width="10" height="42" rx="2"/>
+            <rect x="282" y="36" width="10" height="54" rx="2" opacity=".15"/><rect x="282" y="78" width="10" height="12" rx="2"/>
+            <rect x="296" y="36" width="10" height="54" rx="2" opacity=".15"/><rect x="296" y="62" width="10" height="28" rx="2"/>
+          </g>
+          <path d="M280 98 v26" stroke="var(--muted)" stroke-dasharray="3 3"/>
+          <text x="230" y="140" fill="var(--teal)">ACL</text><text x="230" y="153" fill="var(--teal)">meniscus …</text>
+          <text x="18" y="176" fill="var(--muted)">12 findings · probability per study</text>
+          <rect x="18" y="186" width="284" height="8" rx="4" fill="var(--teal-soft)"/><rect x="18" y="186" width="210" height="8" rx="4" fill="var(--teal)" opacity=".85"/>
+          <rect x="18" y="202" width="284" height="8" rx="4" fill="var(--teal-soft)"/><rect x="18" y="202" width="64" height="8" rx="4" fill="var(--teal)" opacity=".55"/>
+        </g>
+      </svg>
+      <div class="cap-mono">schematic · no patient data</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="summary-grid reveal">
+    <div class="stat-card"><div class="num">0.909</div><div class="label">Cross-validation macro AUC (own models, 5 folds)</div></div>
+    <div class="stat-card"><div class="num">0.947</div><div class="label">Public LB — own models only, no external data</div></div>
+    <div class="stat-card"><div class="num">0.942</div><div class="label">Private LB — final blend (public 0.958); own models alone 0.928</div></div>
+    <div class="stat-card"><div class="num">6,200+</div><div class="label">Teams in the competition · no medal</div></div>
+  </div>
+
+  <div class="glance reveal">
+    <h3 style="margin-top:0">The story in four steps</h3>
+    <div class="glance-flow">
+      <div class="glance-step"><div class="gnum">1</div><div class="gkicker">Baseline</div><div class="gtitle">A model that reads slice stacks</div><div class="gtext">ConvNeXt on 3-slice stacks with per-finding attention. Higher resolution and a bigger backbone gave the first real jump.</div><div class="gmetric">LB 0.932 → 0.945</div></div>
+      <div class="glance-step"><div class="gnum">2</div><div class="gkicker">Ensemble</div><div class="gtitle">Models that disagree usefully</div><div class="gtext">Two more families that were not better alone, but made different mistakes — and lifted validation AUC together.</div><div class="gmetric">CV 0.903 → 0.909</div></div>
+      <div class="glance-step"><div class="gnum">3</div><div class="gkicker">Hidden run</div><div class="gtitle">Two crashes, no log</div><div class="gtext">Every failure path got a tested fallback. The next submission ran end to end on the hidden test set.</div><div class="gmetric">crash ×2 → LB 0.947</div></div>
+      <div class="glance-step"><div class="gnum">4</div><div class="gkicker">Final blend</div><div class="gtitle">Stand out from the copies</div><div class="gtext">My models added at 10% weight to a stronger public ensemble, so the submission differs from hundreds of identical copies.</div><div class="gmetric">LB 0.958</div></div>
+    </div>
+  </div>
+
+  <div class="finding grey reveal"><strong>About the visuals.</strong> Competition rules do not allow redistributing the data, so this page shows no MRI images, reports or per-study records. Charts are drawn from aggregate results (hover over them for exact values); diagrams marked <span class="illus">ILLUSTRATION</span> explain a mechanism with made-up numbers.</div>
+</div>
+
+<!-- 01 PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="section-label"><span class="sn">01</span>Problem</div>
+    <h2>One study, several series, twelve noisy targets</h2>
+    <p class="lead">The input is not a single image. Each study holds several MRI <em>series</em> — stacks of 20–40 slices taken in a given plane with a given contrast. The output is twelve independent probabilities, scored by ROC AUC per finding and averaged with equal weight.</p>
+
+    <h3><span class="step">1.1</span>What a study looks like</h3>
+    <p>I reduce every study to five fixed "slots". Fluid-sensitive sequences make swelling and tears bright; the others show anatomy. Not every study has all five, so a missing slot stays empty and is masked — another sequence is never substituted into it.</p>
+    <div class="slots reveal">
+      <div class="slot"><div class="pl">SAGITTAL</div><div class="nm">fluid-sensitive</div><img src="assets/kneemri/slice_z.png" alt="Sagittal fat-suppressed proton-density knee MRI slice from the public KneeMRI dataset" loading="lazy" class="zoom"><span class="real">real slice · KneeMRI</span></div>
+      <div class="slot"><div class="pl">SAGITTAL</div><div class="nm">other</div><img src="assets/commons/sag_other_sq.png" alt="Sagittal T1-weighted knee MRI slice without fat suppression (Wikimedia Commons, CC BY-SA 4.0)" loading="lazy" class="zoom"><span class="real">real slice · Commons</span></div>
+      <div class="slot"><div class="pl">CORONAL</div><div class="nm">fluid-sensitive</div><img src="assets/commons/coronal_sq.png" alt="Coronal fat-suppressed T2 knee MRI slice showing both condyles and menisci (Wikimedia Commons, CC BY-SA 4.0)" loading="lazy" class="zoom"><span class="real">real slice · Commons</span></div>
+      <div class="slot"><div class="pl">CORONAL</div><div class="nm">other</div><img src="assets/commons/cor_other_sq.png" alt="Coronal T1-weighted knee MRI slice without fat suppression showing both condyles and the tibial plateau (KMAR-50K, CC BY 4.0)" loading="lazy" class="zoom"><span class="real">real slice · KMAR-50K</span></div>
+      <div class="slot"><div class="pl">AXIAL</div><div class="nm">fluid-sensitive</div><img src="assets/commons/axial_sq.png" alt="Axial fat-suppressed knee MRI slice at the patellofemoral joint (Wikimedia Commons, CC BY-SA 4.0)" loading="lazy" class="zoom"><span class="real">real slice · Commons</span></div>
+    </div>
+    <p style="font-size:14px;color:var(--muted)">All five cards show real slices from openly licensed sources: sagittal fluid-sensitive from the <a href="https://zenodo.org/records/14789903">KneeMRI dataset</a> (Clinical Hospital Centre Rijeka, CC BY-NC-ND 4.0, unmodified); sagittal T1, coronal fluid-sensitive and axial from <a href="https://commons.wikimedia.org/wiki/User:Ptrump16">Ptrump16 on Wikimedia Commons</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; cropped and resized by me, shared under the same licence); coronal T1 from <a href="https://doi.org/10.17632/xw7mrg7ntg.6">KMAR-50K</a> by Yuting Wang and Feng Shi (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; resized). None of these images are competition data or were used for training.</p>
+    <p>A series is a stack of parallel slices through the knee. Below are five of the 32 slices in one sagittal series, from one side of the knee to the other. The outer slices show mostly soft tissue; the joint, cartilage and ligaments appear in the middle — which is why the model has to look at many slices, not one.</p>
+    <div class="fig reveal">
+      <div class="series">
+        <figure><img class="zoom" src="assets/kneemri/series_1.png" alt="Slice 2 of 32" loading="lazy"><figcaption>slice 2 / 32</figcaption></figure>
+        <figure><img class="zoom" src="assets/kneemri/series_2.png" alt="Slice 9 of 32" loading="lazy"><figcaption>slice 9 / 32</figcaption></figure>
+        <figure class="cur"><img class="zoom" src="assets/kneemri/series_3.png" alt="Slice 16 of 32" loading="lazy"><figcaption>slice 16 / 32</figcaption></figure>
+        <figure><img class="zoom" src="assets/kneemri/series_4.png" alt="Slice 23 of 32" loading="lazy"><figcaption>slice 23 / 32</figcaption></figure>
+        <figure><img class="zoom" src="assets/kneemri/series_5.png" alt="Slice 30 of 32" loading="lazy"><figcaption>slice 30 / 32</figcaption></figure>
+      </div>
+      <div class="fig-caption"><b>Figure 1</b>One sagittal fluid-sensitive series, 320 × 320 px per slice. Click a slice to enlarge. Example slices: <a href="https://zenodo.org/records/14789903">KneeMRI dataset</a>, Clinical Hospital Centre Rijeka (Štajduhar et al., 2017), <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>, shown unmodified. Not competition data and not used for training.</div>
+    </div>
+
+    <h3><span class="step">1.2</span>The twelve findings</h3>
+    <p>The targets range from common (effusion, osteoarthritis) to rare and small (fractures). Each one counts equally in the score, so a model that ignores the rare findings is punished.</p>
+    <div class="findings-grid reveal">
+      <div class="fgroup"><div class="gname">Ligaments</div><span class="fchip">ACL</span><span class="fchip">MCL</span></div>
+      <div class="fgroup"><div class="gname">Menisci</div><span class="fchip">Medial meniscus</span><span class="fchip">Lateral meniscus</span></div>
+      <div class="fgroup"><div class="gname">Osteoarthritis</div><span class="fchip">Medial OA</span><span class="fchip">Lateral OA</span><span class="fchip">Patellofemoral OA</span></div>
+      <div class="fgroup"><div class="gname">Joint fluid</div><span class="fchip">Effusion</span><span class="fchip">Synovitis</span><span class="fchip">Baker's cyst</span></div>
+      <div class="fgroup"><div class="gname">Bone</div><span class="fchip">Contusion</span><span class="fchip">Fracture</span></div>
+    </div>
+
+    <h3><span class="step">1.3</span>Where the labels come from</h3>
+    <p>This is the harder part. Only 58 of the 4,407 training studies were labelled by radiologists. Everything else comes with a free-text report, from which participants extracted labels with language models. The task is therefore <em>weakly supervised</em>: validation measures agreement with report-derived labels, not clinical accuracy.</p>
+    <div class="fig reveal">
+      <svg id="labelBar" viewBox="0 0 900 120" role="img" aria-label="Label sources: 58 radiologist-labelled studies out of 4,407."></svg>
+      <div class="fig-caption"><b>Figure 2</b>Label sources in the training set. The 58 expert-labelled studies are a sliver — and I kept them out of every decision.</div>
+    </div>
+    <div class="finding blue"><strong>Scope.</strong> This is competition research, not a diagnostic tool. Cross-validation, the public leaderboard and the hidden run are three different kinds of evidence, and I report them separately.</div>
+  </div>
+</section>
+
+<!-- 02 DATA -->
+<section id="data">
+  <div class="container">
+    <div class="section-label"><span class="sn">02</span>Data &amp; labels</div>
+    <h2>Fix the rules before looking at scores</h2>
+    <p class="lead">Before training anything, I froze three things: which label set to learn from, how studies are split into folds, and how the score is computed. Every later experiment reused them, so any difference in score comes from the model — not from a lucky split.</p>
+
+    <h3><span class="step">2.1</span>Soft labels from six label sets</h3>
+    <p>Six public, CC0-licensed label sets were available, each extracted from the reports by a different participant. Instead of picking one, I average them. If four of six say "ACL tear", the target is 0.67 — the model learns that the report is ambiguous rather than being forced to a hard yes or no. Sets that duplicated another or were tuned on the 58 expert studies were left out.</p>
+    <div class="fig reveal">
+      <svg id="consensus" viewBox="0 0 900 250" role="img" aria-label="Six label sets voting on one finding, averaged into a soft label."></svg>
+      <div class="fig-caption"><b>Figure 3</b>How a soft label is formed for one study and one finding. Click a dot to flip that vote and see the target change. <span class="illus">ILLUSTRATION</span></div>
+    </div>
+
+    <h3><span class="step">2.2</span>Five frozen folds</h3>
+    <p>The 4,258 studies used for training are split once into five folds of 851–852 studies. Each model is trained five times, each time holding out one fold for validation, so every study is predicted exactly once by a model that never saw it.</p>
+    <div class="fig reveal">
+      <svg id="folds" viewBox="0 0 900 250" role="img" aria-label="Five-fold cross-validation scheme."></svg>
+      <div class="fig-caption"><b>Figure 4</b>Cross-validation scheme. Hover over a row to highlight which fold is held out.</div>
+    </div>
+
+    <h3><span class="step">2.3</span>One number per model</h3>
+    <div class="three-col reveal">
+      <div class="method-card"><h4>Cohort</h4><div class="big">4,258 studies</div><p>Five folds (852 / 852 / 852 / 851 / 851), frozen once and reused for every experiment.</p></div>
+      <div class="method-card"><h4>Labels</h4><div class="big">Soft consensus</div><p>Mean of six CC0 label sets. Findings a report never mentions are excluded from scoring.</p></div>
+      <div class="method-card"><h4>Metric</h4><div class="big">12 equal AUCs</div><p>ROC AUC per finding, averaged with equal weight, computed per fold, then averaged across folds.</p></div>
+    </div>
+    <div class="finding"><strong>The 58 expert-labelled studies were never used</strong> for training, tuning or model selection — they were the only unbiased yardstick available, and I kept it that way.</div>
+  </div>
+</section>
+
+<!-- 03 PIPELINE -->
+<section id="pipeline">
+  <div class="container">
+    <div class="section-label"><span class="sn">03</span>Pipeline</div>
+    <h2>From slice stacks to a study-level prediction</h2>
+    <p class="lead">A 3D network on full MRI volumes is slow to train and data-hungry. Instead I use a "2.5D" approach: standard 2D image networks that see three neighbouring slices at once, followed by an attention layer that decides which slices matter. Four steps turn a raw study into twelve probabilities.</p>
+
+    <h3><span class="step">3.1</span>Crop to the same physical size</h3>
+    <p>Scanners use different pixel sizes, so the same knee can fill 280 or 470 pixels. I crop every slice to a fixed <em>140 mm</em> field using the pixel spacing stored in the DICOM header, then resize to 384 px. Now one pixel means roughly the same physical distance in every study.</p>
+    <div class="fig reveal">
+      <div class="crop-demo">
+        <div><div class="frame"><img class="zoom" src="assets/commons/axial_full.png" alt="Full axial knee MRI frame with a dashed crop box around the knee" loading="lazy"><div class="box"></div></div><div class="cap">full frame · 1190 × 896 px</div></div>
+        <div class="arrow">crop →<br>resize</div>
+        <div class="out"><img class="zoom" src="assets/commons/axial_sq.png" alt="Cropped and resized axial knee MRI" loading="lazy"><div class="cap">model input · square</div></div>
+      </div>
+      <div class="fig-caption"><b>Figure 5</b>The crop step on a real axial slice. Here the box is placed around the knee for illustration; in my pipeline its size is computed from the DICOM pixel spacing so that it always covers 140 mm. Axial MRI: <a href="https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg">Ptrump16, Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; frames extracted, cropped and resized by me — this figure is shared under the same licence. None of these images are competition data or were used for training.</div>
+    </div>
+    <p>Why use physical size instead of a fixed pixel crop? Because the same 280-pixel box covers very different anatomy on different scanners. Below, one real coronal slice at its native resolution and the same slice at half the resolution:</p>
+    <div class="fig reveal">
+      <div class="crop-legend"><span><i style="border-top:2px dashed var(--amber)"></i>fixed 280-pixel crop</span><span><i style="border-top:2px solid #3cbfb6"></i>fixed 140 mm crop (what I use)</span></div>
+      <div class="scan2">
+        <div class="scan-col">
+          <h5>Scanner 1<span>640 px · 0.26 mm / px</span></h5>
+          <div class="scan-full"><img class="zoom" src="assets/crop/scan1_full.png" alt="Coronal T1 knee MRI at 0.26 mm per pixel with two crop boxes" loading="lazy"><div class="b px" style="left:26.56%;top:29.69%;width:43.75%;height:43.75%"></div><div class="b mm" style="left:6.02%;top:9.14%;width:84.84%;height:84.84%"></div></div>
+          <div class="scan-outs">
+            <figure class="px"><img class="zoom" src="assets/crop/scan1_px.png" alt="Fixed 280 pixel crop, scanner 1" loading="lazy"><figcaption>280 px = 72 mm<br>zoomed in, joint cut off</figcaption></figure>
+            <figure class="mm"><img class="zoom" src="assets/crop/scan1_mm.png" alt="140 mm crop, scanner 1" loading="lazy"><figcaption>140 mm = 543 px<br>→ resized to 384</figcaption></figure>
+          </div>
+        </div>
+        <div class="scan-col">
+          <h5>Scanner 2<span>330 px · 0.50 mm / px (simulated)</span></h5>
+          <div class="scan-full"><img class="zoom" src="assets/crop/scan2_full.png" alt="Same slice downsampled to 0.5 mm per pixel, with crop box" loading="lazy" style="image-rendering:pixelated"><div class="b mm" style="left:6.06%;top:9.09%;width:84.85%;height:84.85%"></div><div class="b px" style="left:6.06%;top:9.09%;width:84.85%;height:84.85%;border-color:var(--amber);margin:3px;width:calc(84.85% - 6px);height:calc(84.85% - 6px)"></div></div>
+          <div class="scan-outs">
+            <figure class="px"><img class="zoom" src="assets/crop/scan2_px.png" alt="Fixed 280 pixel crop, scanner 2" loading="lazy"><figcaption>280 px = 140 mm<br>whole joint</figcaption></figure>
+            <figure class="mm"><img class="zoom" src="assets/crop/scan2_mm.png" alt="140 mm crop, scanner 2" loading="lazy"><figcaption>140 mm = 280 px<br>→ resized to 384</figcaption></figure>
+          </div>
+        </div>
+      </div>
+      <div class="fig-caption"><b>Figure 6</b>Why I crop by physical size. With a fixed pixel crop (dashed), the same knee appears at very different zoom levels depending on the scanner. With a 140 mm crop (solid), both scanners give the same view — compare the two solid-bordered outputs. Scanner 2 is simulated by downsampling the same real slice to 0.5 mm / px. Coronal T1 MRI: Yuting Wang and Feng Shi, <a href="https://doi.org/10.17632/xw7mrg7ntg.6">KMAR-50K</a>, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; resized, downsampled and cropped by me. Not competition data; not used for training.</div>
+    </div>
+
+    <h3><span class="step">3.2</span>Stack three neighbouring slices</h3>
+    <p>Image networks expect three colour channels. I fill them with three adjacent slices (z−1, z, z+1) instead of red, green and blue. The network then sees a little depth — enough to tell a tear running across slices from noise on one slice — at the cost of a normal 2D model. A study yields up to 86 such stacks across its five slots.</p>
+    <div class="fig reveal">
+      <div class="merge">
+        <figure class="series" style="display:block"><img class="zoom" src="assets/commons/axial_sq_zm1.png" alt="Axial slice z minus 1" loading="lazy" style="border-top:4px solid #d0453c"><figcaption>z − 1 → red</figcaption></figure>
+        <figure class="series" style="display:block"><img class="zoom" src="assets/commons/axial_sq.png" alt="Axial slice z" loading="lazy" style="border-top:4px solid #2f9b5a"><figcaption>z → green</figcaption></figure>
+        <figure class="series" style="display:block"><img class="zoom" src="assets/commons/axial_sq_zp1.png" alt="Axial slice z plus 1" loading="lazy" style="border-top:4px solid #3a6fc4"><figcaption>z + 1 → blue</figcaption></figure>
+        <div class="eq">=</div>
+        <figure class="series" style="display:block"><img class="zoom" src="assets/commons/axial_rgb.png" alt="The three axial slices merged into one colour image" loading="lazy" style="border-top:4px solid var(--ink)"><figcaption>one 3-channel image</figcaption></figure>
+      </div>
+      <svg id="stackFig" viewBox="0 0 900 150" role="img" aria-label="The three-channel image is encoded by a 2D backbone." style="margin-top:14px"></svg>
+      <div class="fig-caption"><b>Figure 7</b>Three neighbouring real axial slices merged into the red, green and blue channels of one image. Where the slices agree the result is grey; the coloured fringes are exactly where anatomy changes from one slice to the next — that is the depth information the 2D network gets. Axial MRI: <a href="https://commons.wikimedia.org/wiki/File:Knee_MRI_pd_tse_fs_tra_320.ogg">Ptrump16, Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; frames extracted, cropped and resized, colour-merged by me — this figure is shared under the same licence. None of these images are competition data or were used for training.</div>
+    </div>
+
+    <h3><span class="step">3.3</span>Let each finding choose its slices</h3>
+    <p>The backbone turns every stack into a feature vector. A study-level label does not say <em>which</em> slice shows the tear, so this is a multiple-instance problem: I learn a separate attention layer per finding that weights the stacks before pooling. An ACL tear can focus on a few central sagittal slices, while osteoarthritis spreads its attention over coronal slices.</p>
+    <div class="fig reveal">
+      <div class="fig-tools"><span class="lbl">Finding</span><button class="tbtn on" data-att="acl">ACL</button><button class="tbtn" data-att="moa">Medial OA</button><button class="tbtn" data-att="eff">Effusion</button><button class="tbtn" data-att="frx">Fracture</button></div>
+      <svg id="attFig" viewBox="0 0 900 250" role="img" aria-label="Per-finding attention weights over slice stacks."></svg>
+      <div class="fig-caption"><b>Figure 8</b>Per-finding attention over the stacks of one study. Switch findings to see the weights move. <span class="illus">ILLUSTRATION</span></div>
+    </div>
+
+    <h3><span class="step">3.4</span>Average a mirrored view</h3>
+    <p>At test time every study is also predicted as its anatomical mirror image, and the two predictions are averaged. The mirror has to be correct for each plane: for sagittal stacks, left–right is the slice <em>order</em>, so the three channels are reversed; for coronal and axial, the image is flipped horizontally.</p>
+    <div class="fig reveal">
+      <svg id="ttaFig" viewBox="0 0 900 330" role="img" aria-label="Mirror test-time augmentation per plane."></svg>
+      <div class="fig-caption"><b>Figure 9</b>Anatomically correct mirror. Sagittal (real KneeMRI slices, shown unmodified): the three slices are simply used in reverse order. Coronal / axial: the image is flipped horizontally (real coronal slice — the two condyles swap sides). Sagittal slices: <a href="https://zenodo.org/records/14789903">KneeMRI dataset</a>, Clinical Hospital Centre Rijeka (Štajduhar et al., 2017), <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>, shown unmodified. Coronal MRI: <a href="https://commons.wikimedia.org/wiki/File:Knee_MRI_t2_tse_fs_cor_320.ogg">Ptrump16, Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>; frame extracted, cropped, resized and flipped by me — shared under the same licence. None of these images are competition data or were used for training.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 MODELS -->
+<section id="models">
+  <div class="container">
+    <div class="section-label"><span class="sn">04</span>Models</div>
+    <h2>Three model families, one recipe</h2>
+    <p class="lead">All families share the labels, folds, loss (soft binary cross-entropy), optimiser (AdamW, 5% warm-up, cosine decay) and attention head. They differ in <em>what they see</em> and <em>how they are trained</em> — on purpose, so that their mistakes differ too.</p>
+    <div class="three-col reveal">
+      <div class="method-card family-card" style="--c:var(--c-a)"><h4>Family A · baseline</h4><div class="big">0.9033</div><p>5-fold macro AUC</p><dl><dt>backbone</dt><dd>ConvNeXt-Small (ImageNet-22k)</dd><dt>view</dt><dd>centre ~120 mm at 320 px</dd><dt>training</dt><dd>24 stacks / study, 20 epochs</dd></dl></div>
+      <div class="method-card family-card" style="--c:var(--c-t)"><h4>Family T · denser sampling</h4><div class="big">0.9032</div><p>5-fold macro AUC</p><dl><dt>backbone</dt><dd>ConvNeXt-Small</dd><dt>view</dt><dd>random 320 px crops</dd><dt>training</dt><dd>48 stacks, intensity jitter, mirror, EMA weights, 14 epochs</dd></dl></div>
+      <div class="method-card family-card" style="--c:var(--c-f)"><h4>Family F · different eyes</h4><div class="big">0.8998</div><p>2-fold macro AUC</p><dl><dt>backbone</dt><dd>MaxViT-Small (CNN + attention)</dd><dt>view</dt><dd>full 140 mm at 384 px</dd><dt>training</dt><dd>24 stacks, 20 epochs, frozen BN statistics</dd></dl></div>
+    </div>
+    <div class="formula">own ensemble = (A + T + F) / 3</div>
+    <p>A and T share a backbone but see the knee differently — fixed centre crop versus random crops with twice as many slices. F uses a different architecture and the full field of view, which helps for findings that can sit anywhere in the image, such as fractures.</p>
+  </div>
+</section>
+
+<!-- 05 VALIDATION -->
+<section id="validation">
+  <div class="container">
+    <div class="section-label"><span class="sn">05</span>Validation</div>
+    <h2>The gain is in the combination</h2>
+    <div class="rq reveal"><div class="rq-num">?</div><div class="rq-q">If two models score the same on their own, can averaging them still help?</div></div>
+
+    <h3><span class="step">5.1</span>Per-fold scores</h3>
+    <p>A and T reach almost identical AUC alone, yet their average is about half a point higher in every fold. Adding F — which is <em>weaker</em> alone — lifts it again. Click the legend to hide or show a model.</p>
+    <div class="fig reveal">
+      <div class="fig-tools" id="foldLegend"></div>
+      <svg id="foldChart" viewBox="0 0 900 340" role="img" aria-label="Macro AUC per fold for each model and ensemble."></svg>
+      <div class="fig-caption"><b>Figure 10</b>Macro AUC per validation fold. F was trained on folds 0–1 only; missing folds are left blank, not filled in.</div>
+    </div>
+
+    <h3><span class="step">5.2</span>Per-finding scores</h3>
+    <p>The macro score hides large differences between findings. MCL and lateral OA are the hardest; fractures, Baker's cysts and synovitis the easiest. Darker cells are higher AUC; the best model per finding is outlined.</p>
+    <div class="fig reveal">
+      <svg id="heatmap" viewBox="0 0 900 480" role="img" aria-label="AUC per finding and model."></svg>
+      <div class="fig-caption"><b>Figure 11</b>AUC per finding, mean of folds 0–1 (the folds where every model was trained). Z is an experimental family that was not adopted.</div>
+    </div>
+
+    <h3><span class="step">5.3</span>What F adds</h3>
+    <p>Comparing the three-model ensemble against A + T shows where the gain comes from: F helps on 9 of 12 findings — most on fracture (+0.010), then MCL and medial meniscus — and slightly hurts ACL and medial OA. That matches where its errors differ most from A (Figure 13).</p>
+    <div class="fig reveal">
+      <svg id="gainChart" viewBox="0 0 900 440" role="img" aria-label="AUC gain per finding from adding F."></svg>
+      <div class="fig-caption"><b>Figure 12</b>AUC change per finding when F is added to A + T (folds 0–1).</div>
+    </div>
+
+    <h3><span class="step">5.4</span>How different are the mistakes?</h3>
+    <p>To judge diversity I compare prediction errors: the Spearman correlation of residuals (prediction minus label) between two families. 1.0 would mean identical mistakes. F is most different on fracture and MCL; the experimental family G was more different everywhere — but, as section 08 shows, that did not translate into enough gain.</p>
+    <div class="fig reveal">
+      <svg id="residChart" viewBox="0 0 900 460" role="img" aria-label="Residual correlation with family A per finding, for F and G."></svg>
+      <div class="fig-caption"><b>Figure 13</b>Error correlation with family A per finding (mean of folds 0–1). Further left = more complementary.</div>
+    </div>
+    <div class="finding"><strong>An honest footnote on F.</strong> F had to pass two thresholds set before training: an ensemble gain of at least +0.002 (it reached +0.0027) and an average error correlation with A of at most 0.91 (it was 0.925). I kept it after seeing the result, so its inclusion is a judgement call, not a pre-registered pass.</div>
+  </div>
+</section>
+
+<!-- 06 BLEND -->
+<section id="blend">
+  <div class="container">
+    <div class="section-label"><span class="sn">06</span>Final blend</div>
+    <h2>Standing on a public ensemble — and saying so</h2>
+    <p class="lead">By the last week, the strongest public notebooks scored 0.958 and hundreds of teams were submitting identical copies. Copies all receive the same private score. My final submission blends my own models into one of them (goodpjw2008, Apache-2.0), which I did not train, so it can move away from the crowd if my models carry real signal.</p>
+
+    <h3><span class="step">6.1</span>Blend ranks, not probabilities</h3>
+    <p>AUC only cares about the <em>order</em> of predictions, and two models can be calibrated very differently. So I convert each model's predictions to ranks per finding and mix the ranks:</p>
+    <div class="formula">final = 0.90 · rank(public ensemble) + 0.10 · rank(own ensemble)</div>
+    <p>Drag the slider to see how the own model's weight reorders six example studies. At small weights it only breaks near-ties in the public model — exactly where a second opinion is most useful.</p>
+    <div class="fig reveal">
+      <div class="slider-row"><span class="lbl" style="font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase">own weight</span><input type="range" id="wSlider" min="0" max="0.5" step="0.05" value="0.10"><span class="val" id="wVal">w = 0.10</span></div>
+      <div class="table-wrap" style="box-shadow:none;margin:0"><table class="result-table rank-table" id="rankTable"></table></div>
+      <div class="fig-caption"><b>Figure 14</b>Rank blending on six example studies. Highlighted rows changed position compared with the public model alone. <span class="illus">ILLUSTRATION</span></div>
+    </div>
+    <p>A 0.30 weight lowered the public score to 0.957; 0.10 kept it at 0.958 — so the weight was chosen after seeing leaderboard results, and I say so.</p>
+
+    <h3><span class="step">6.2</span>Leaderboard history</h3>
+    <div class="fig reveal">
+      <svg id="lbChart" viewBox="0 0 900 340" role="img" aria-label="Public leaderboard score per submission."></svg>
+      <div class="fig-caption"><b>Figure 15</b>Public leaderboard per submission. Crosses are crashed runs (no score). Rings mark the two final selections. Identical rounded scores do not mean identical predictions.</div>
+    </div>
+    <div class="finding blue"><strong>Disclosure.</strong> The public ensemble contains models trained with external data — OAI knee MRIs and an SKM-TEA anatomy network used for local crops. My own models use neither. That is why my second final submission is my own ensemble alone, in case external data is ruled out.</div>
+    <div class="pending" style="border-style:solid;border-color:var(--line);background:var(--panel)">
+      <h4 style="color:var(--ink)">Private leaderboard — final result</h4>
+      <div class="table-wrap" style="box-shadow:none"><table class="result-table">
+        <thead><tr><th>Submission</th><th>Public</th><th>Private</th></tr></thead>
+        <tbody>
+          <tr><td>Final blend: public ensemble + own models (w = 0.10)</td><td class="num">0.958</td><td class="num">0.942</td></tr>
+          <tr><td>Public ensemble alone (reference, not selected)</td><td class="num">0.958</td><td class="num">0.942</td></tr>
+          <tr><td>Own models only, no external data</td><td class="num">0.947</td><td class="num">0.928</td></tr>
+        </tbody>
+      </table></div>
+      <p>No medal. Every submission dropped by 0.016–0.019 from public to private. The blend scored the same as the public ensemble alone to three decimals, so my models at 10% weight neither helped nor hurt: a 0.928 model added to a 0.942 one did not see enough of what the stronger model missed. Differentiating from public copies only works when your own model is competitive on its own — which, for this task, meant anatomy-guided crops built early.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 HIDDEN RUN -->
+<section id="hidden">
+  <div class="container">
+    <div class="section-label"><span class="sn">07</span>Hidden run</div>
+    <h2>A model only counts if it finishes</h2>
+    <div class="bridge reveal"><span class="arrow">↳</span><p><strong>Coming from the ensemble:</strong> adding F improved validation — but the first two submissions containing F crashed on the hidden test set, which returns no error log.</p></div>
+    <p>A full rehearsal on 1,300 training studies ran cleanly, so I could not reproduce the crash. Instead of guessing the cause, I made every failure path I could think of survivable, then forced each one on purpose in a 100-study test.</p>
+    <div class="fig reveal">
+      <svg id="flowFig" viewBox="0 0 900 360" role="img" aria-label="Robust inference decision flow."></svg>
+      <div class="fig-caption"><b>Figure 16</b>Robust inference. Every branch was triggered deliberately in testing before the real submission.</div>
+    </div>
+    <ol class="steps reveal">
+      <li><strong>Check every output</strong><br>Logits are tested for NaN or infinity after every forward pass, for every fold and every mirrored view, before anything is averaged.</li>
+      <li><strong>Retry in full precision</strong><br>A pass that overflows in half precision is re-run in fp32, in chunks of 16 stacks so the retry cannot run out of GPU memory (peak 6.5 GB).</li>
+      <li><strong>Fall back instead of failing</strong><br>If F still fails on a study, that study uses A + T; if all own models fail, the training prevalence. The submission file is checked — every row, every target, all finite — and written atomically.</li>
+    </ol>
+    <div class="finding green"><strong>Result.</strong> The next submission ran end to end and scored 0.947 with no external data. The rehearsal took 4 h 50 min on two T4 GPUs for 1,300 studies.</div>
+    <div class="finding grey"><strong>Mirror check.</strong> An outside reviewer asked whether the test-time mirror flips sagittal slices front-to-back. It does not: sagittal stacks are reversed in slice order and other planes are flipped left–right (Figure 9).</div>
+  </div>
+</section>
+
+<!-- 08 DIDN'T WORK -->
+<section id="didnt">
+  <div class="container">
+    <div class="section-label"><span class="sn">08</span>What didn't work</div>
+    <h2>The paths I didn't take are part of the result</h2>
+    <p class="lead">Each idea had to clear a threshold fixed before its results were seen. Most did not — and a near miss still counts as a miss.</p>
+    <div class="fig reveal">
+      <svg id="gateChart" viewBox="0 0 900 330" role="img" aria-label="Measured ensemble gain versus pre-set threshold for each experiment."></svg>
+      <div class="fig-caption"><b>Figure 17</b>Measured two-fold gain (bar) against the threshold set in advance (black tick). Hover for details.</div>
+    </div>
+    <div class="table-wrap reveal"><table class="result-table">
+      <thead><tr><th>Idea</th><th>Outcome</th><th>What it taught me</th></tr></thead>
+      <tbody>
+        <tr><td>Higher resolution (448 px)</td><td class="no">not adopted</td><td>More pixels over the whole field added little</td></tr>
+        <tr><td>Second random seed</td><td class="no">not adopted</td><td>Two seeds of one recipe make nearly the same mistakes</td></tr>
+        <tr><td>OAI external data (−0.0119)</td><td class="no">not adopted</td><td>Different label definitions and scanners hurt more than extra data helped</td></tr>
+        <tr><td>Slice-context transformer (G)</td><td class="no">not adopted</td><td>The most different errors of any family, but not enough gain</td></tr>
+        <tr><td>Tighter joint crop (Z)</td><td class="no">not adopted</td><td>A fixed centre zoom is not the same as anatomy-guided cropping</td></tr>
+        <tr><td>Anatomy-guided crops (S6)</td><td class="stop">stopped</td><td>~250 GB of raw DICOM to prepare with two days left</td></tr>
+      </tbody>
+    </table></div>
+    <h3>The one I would start with next time</h3>
+    <p>The strongest public single models zoom into the menisci and cartilage using an anatomy network. Retraining that pipeline on my labels looked like the biggest remaining gain, but it needed raw DICOMs (253.6 GB compressed) instead of my cached slices. Inference alone measured 13.3 s per study on two T4 GPUs, and the original author reported ~15 hours of training. I stopped it with two days left rather than put the final submissions at risk.</p>
+  </div>
+</section>
+
+<!-- 09 LESSONS -->
+<section id="lessons">
+  <div class="container">
+    <div class="section-label"><span class="sn">09</span>Lessons</div>
+    <h2>What I would do differently</h2>
+    <div class="two-col reveal">
+      <div class="method-card"><h4>Measure the ensemble, not the model</h4><p>A weaker model that makes different mistakes can be worth more than a stronger copy of what you already have (Figures 10 and 12).</p></div>
+      <div class="method-card"><h4>Build the data path first</h4><p>Raw-data access and anatomy-guided crops belong in week one. In the final week, data movement — not GPU time — was the bottleneck.</p></div>
+      <div class="method-card"><h4>Read the strongest public work early</h4><p>Several ideas I reached late were already described in public write-ups.</p></div>
+      <div class="method-card"><h4>Treat the hidden run as part of the model</h4><p>Force every fallback on purpose. A crash scores zero, however good the model is.</p></div>
+    </div>
+    <div class="finding"><strong>Hypothesis for future work:</strong> local, anatomy-guided cropping is probably the biggest gap between my models and the strongest public ones. It was not measured here.</div>
+  </div>
+</section>
+
+<!-- 10 CODE -->
+<section id="code">
+  <div class="container">
+    <div class="section-label"><span class="sn">10</span>Code</div>
+    <h2>Code and aggregate results, no private data</h2>
+    <p>The repository contains training and inference code for the model families, fixed recipe configs, the robust inference wrapper and every aggregate table behind the charts on this page. Exact scores need the original cohort, labels and folds, which cannot be redistributed; weights are not included.</p>
+    <pre><code>python -m pip install -e ".[dev]"
+python -m pytest
+python scripts/plot_results.py
+python scripts/audit_release.py</code></pre>
+    <p><a href="../README.md">Repository overview</a> · <a href="../REPRODUCE.md">How to reproduce</a> · <a href="EVIDENCE.md">Evidence and limitations</a> · <a href="KAGGLE_DISCUSSION.md">Kaggle write-up</a> · <a href="../ATTRIBUTION.md">Attribution</a> · <a href="../LICENSE">Apache-2.0</a></p>
+  </div>
+</section>
+
+<footer>
+  <div class="inner">
+    <span><span class="who">Tümer Kaan Mutlu</span> · Istanbul Bilgi University, Industrial Engineering</span>
+    <span>RSNA Knee Abnormality Detection · Kaggle · October 2026</span>
+  </div>
+</footer>
+<button class="to-top" id="toTop" aria-label="Back to top">↑</button>
+<div id="tip"></div>
+<div class="lightbox" id="lightbox"><img alt=""></div>
+
+<script>
+const DATA = {"fold":[{"family":"A","fold":0,"auc":0.89743},{"family":"A","fold":1,"auc":0.908485},{"family":"A","fold":2,"auc":0.902612},{"family":"A","fold":3,"auc":0.903209},{"family":"A","fold":4,"auc":0.904856},{"family":"T","fold":0,"auc":0.898339},{"family":"T","fold":1,"auc":0.909725},{"family":"T","fold":2,"auc":0.903542},{"family":"T","fold":3,"auc":0.904418},{"family":"T","fold":4,"auc":0.900056},{"family":"A + T","fold":0,"auc":0.904184},{"family":"A + T","fold":1,"auc":0.914545},{"family":"A + T","fold":2,"auc":0.908165},{"family":"A + T","fold":3,"auc":0.909673},{"family":"A + T","fold":4,"auc":0.907335},{"family":"F","fold":0,"auc":0.893657},{"family":"A + T + F","fold":0,"auc":0.906955},{"family":"F","fold":1,"auc":0.905847},{"family":"A + T + F","fold":1,"auc":0.917181},{"family":"Z","fold":0,"auc":0.892564},{"family":"Z + T + F","fold":0,"auc":0.906135},{"family":"Z","fold":1,"auc":0.90662},{"family":"Z + T + F","fold":1,"auc":0.91714},{"family":"G + T + F","fold":0,"auc":0.908425},{"family":"G + T + F","fold":1,"auc":0.917293}],"target":[{"family":"A","fold":0,"target":"ACL","auc":0.899536},{"family":"A","fold":0,"target":"MCL","auc":0.830012},{"family":"A","fold":0,"target":"Medial Meniscus","auc":0.916861},{"family":"A","fold":0,"target":"Lateral Meniscus","auc":0.887204},{"family":"A","fold":0,"target":"Medial OA","auc":0.91273},{"family":"A","fold":0,"target":"Lateral OA","auc":0.853091},{"family":"A","fold":0,"target":"PF OA","auc":0.889187},{"family":"A","fold":0,"target":"Effusion","auc":0.878592},{"family":"A","fold":0,"target":"Synovitis","auc":0.915554},{"family":"A","fold":0,"target":"Baker's","auc":0.931906},{"family":"A","fold":0,"target":"Contusion","auc":0.91649},{"family":"A","fold":0,"target":"Fracture","auc":0.938},{"family":"A","fold":1,"target":"ACL","auc":0.889732},{"family":"A","fold":1,"target":"MCL","auc":0.851834},{"family":"A","fold":1,"target":"Medial Meniscus","auc":0.928054},{"family":"A","fold":1,"target":"Lateral Meniscus","auc":0.905422},{"family":"A","fold":1,"target":"Medial OA","auc":0.909559},{"family":"A","fold":1,"target":"Lateral OA","auc":0.88481},{"family":"A","fold":1,"target":"PF OA","auc":0.901437},{"family":"A","fold":1,"target":"Effusion","auc":0.891304},{"family":"A","fold":1,"target":"Synovitis","auc":0.940505},{"family":"A","fold":1,"target":"Baker's","auc":0.932663},{"family":"A","fold":1,"target":"Contusion","auc":0.923663},{"family":"A","fold":1,"target":"Fracture","auc":0.94284},{"family":"A","fold":2,"target":"ACL","auc":0.905229},{"family":"A","fold":2,"target":"MCL","auc":0.876632},{"family":"A","fold":2,"target":"Medial Meniscus","auc":0.915425},{"family":"A","fold":2,"target":"Lateral Meniscus","auc":0.882389},{"family":"A","fold":2,"target":"Medial OA","auc":0.906573},{"family":"A","fold":2,"target":"Lateral OA","auc":0.889526},{"family":"A","fold":2,"target":"PF OA","auc":0.91301},{"family":"A","fold":2,"target":"Effusion","auc":0.869391},{"family":"A","fold":2,"target":"Synovitis","auc":0.913843},{"family":"A","fold":2,"target":"Baker's","auc":0.912413},{"family":"A","fold":2,"target":"Contusion","auc":0.931368},{"family":"A","fold":2,"target":"Fracture","auc":0.915542},{"family":"A","fold":3,"target":"ACL","auc":0.91011},{"family":"A","fold":3,"target":"MCL","auc":0.835243},{"family":"A","fold":3,"target":"Medial Meniscus","auc":0.927609},{"family":"A","fold":3,"target":"Lateral Meniscus","auc":0.912658},{"family":"A","fold":3,"target":"Medial OA","auc":0.890818},{"family":"A","fold":3,"target":"Lateral OA","auc":0.862989},{"family":"A","fold":3,"target":"PF OA","auc":0.870739},{"family":"A","fold":3,"target":"Effusion","auc":0.87181},{"family":"A","fold":3,"target":"Synovitis","auc":0.943614},{"family":"A","fold":3,"target":"Baker's","auc":0.943847},{"family":"A","fold":3,"target":"Contusion","auc":0.915766},{"family":"A","fold":3,"target":"Fracture","auc":0.953311},{"family":"A","fold":4,"target":"ACL","auc":0.893617},{"family":"A","fold":4,"target":"MCL","auc":0.843266},{"family":"A","fold":4,"target":"Medial Meniscus","auc":0.9309},{"family":"A","fold":4,"target":"Lateral Meniscus","auc":0.883746},{"family":"A","fold":4,"target":"Medial OA","auc":0.92113},{"family":"A","fold":4,"target":"Lateral OA","auc":0.861448},{"family":"A","fold":4,"target":"PF OA","auc":0.90537},{"family":"A","fold":4,"target":"Effusion","auc":0.887339},{"family":"A","fold":4,"target":"Synovitis","auc":0.954359},{"family":"A","fold":4,"target":"Baker's","auc":0.934345},{"family":"A","fold":4,"target":"Contusion","auc":0.913067},{"family":"A","fold":4,"target":"Fracture","auc":0.929686},{"family":"T","fold":0,"target":"ACL","auc":0.905859},{"family":"T","fold":0,"target":"MCL","auc":0.832679},{"family":"T","fold":0,"target":"Medial Meniscus","auc":0.91425},{"family":"T","fold":0,"target":"Lateral Meniscus","auc":0.892843},{"family":"T","fold":0,"target":"Medial OA","auc":0.903216},{"family":"T","fold":0,"target":"Lateral OA","auc":0.872703},{"family":"T","fold":0,"target":"PF OA","auc":0.882123},{"family":"T","fold":0,"target":"Effusion","auc":0.870626},{"family":"T","fold":0,"target":"Synovitis","auc":0.922897},{"family":"T","fold":0,"target":"Baker's","auc":0.914769},{"family":"T","fold":0,"target":"Contusion","auc":0.915985},{"family":"T","fold":0,"target":"Fracture","auc":0.952113},{"family":"T","fold":1,"target":"ACL","auc":0.897022},{"family":"T","fold":1,"target":"MCL","auc":0.869901},{"family":"T","fold":1,"target":"Medial Meniscus","auc":0.927438},{"family":"T","fold":1,"target":"Lateral Meniscus","auc":0.907553},{"family":"T","fold":1,"target":"Medial OA","auc":0.912134},{"family":"T","fold":1,"target":"Lateral OA","auc":0.891876},{"family":"T","fold":1,"target":"PF OA","auc":0.892377},{"family":"T","fold":1,"target":"Effusion","auc":0.888616},{"family":"T","fold":1,"target":"Synovitis","auc":0.954026},{"family":"T","fold":1,"target":"Baker's","auc":0.938434},{"family":"T","fold":1,"target":"Contusion","auc":0.911426},{"family":"T","fold":1,"target":"Fracture","auc":0.925897},{"family":"T","fold":2,"target":"ACL","auc":0.92653},{"family":"T","fold":2,"target":"MCL","auc":0.86992},{"family":"T","fold":2,"target":"Medial Meniscus","auc":0.917167},{"family":"T","fold":2,"target":"Lateral Meniscus","auc":0.88788},{"family":"T","fold":2,"target":"Medial OA","auc":0.905001},{"family":"T","fold":2,"target":"Lateral OA","auc":0.891376},{"family":"T","fold":2,"target":"PF OA","auc":0.902414},{"family":"T","fold":2,"target":"Effusion","auc":0.877386},{"family":"T","fold":2,"target":"Synovitis","auc":0.915888},{"family":"T","fold":2,"target":"Baker's","auc":0.900604},{"family":"T","fold":2,"target":"Contusion","auc":0.921851},{"family":"T","fold":2,"target":"Fracture","auc":0.926488},{"family":"T","fold":3,"target":"ACL","auc":0.931249},{"family":"T","fold":3,"target":"MCL","auc":0.847692},{"family":"T","fold":3,"target":"Medial Meniscus","auc":0.931144},{"family":"T","fold":3,"target":"Lateral Meniscus","auc":0.908091},{"family":"T","fold":3,"target":"Medial OA","auc":0.896232},{"family":"T","fold":3,"target":"Lateral OA","auc":0.858149},{"family":"T","fold":3,"target":"PF OA","auc":0.882221},{"family":"T","fold":3,"target":"Effusion","auc":0.880051},{"family":"T","fold":3,"target":"Synovitis","auc":0.927726},{"family":"T","fold":3,"target":"Baker's","auc":0.950716},{"family":"T","fold":3,"target":"Contusion","auc":0.903842},{"family":"T","fold":3,"target":"Fracture","auc":0.935901},{"family":"T","fold":4,"target":"ACL","auc":0.890713},{"family":"T","fold":4,"target":"MCL","auc":0.826472},{"family":"T","fold":4,"target":"Medial Meniscus","auc":0.933292},{"family":"T","fold":4,"target":"Lateral Meniscus","auc":0.879444},{"family":"T","fold":4,"target":"Medial OA","auc":0.925024},{"family":"T","fold":4,"target":"Lateral OA","auc":0.86756},{"family":"T","fold":4,"target":"PF OA","auc":0.905541},{"family":"T","fold":4,"target":"Effusion","auc":0.883467},{"family":"T","fold":4,"target":"Synovitis","auc":0.945424},{"family":"T","fold":4,"target":"Baker's","auc":0.925837},{"family":"T","fold":4,"target":"Contusion","auc":0.90149},{"family":"T","fold":4,"target":"Fracture","auc":0.916405},{"family":"A + T","fold":0,"target":"ACL","auc":0.909348},{"family":"A + T","fold":0,"target":"MCL","auc":0.842585},{"family":"A + T","fold":0,"target":"Medial Meniscus","auc":0.919724},{"family":"A + T","fold":0,"target":"Lateral Meniscus","auc":0.898165},{"family":"A + T","fold":0,"target":"Medial OA","auc":0.911725},{"family":"A + T","fold":0,"target":"Lateral OA","auc":0.870814},{"family":"A + T","fold":0,"target":"PF OA","auc":0.892098},{"family":"A + T","fold":0,"target":"Effusion","auc":0.88043},{"family":"A + T","fold":0,"target":"Synovitis","auc":0.921228},{"family":"A + T","fold":0,"target":"Baker's","auc":0.931155},{"family":"A + T","fold":0,"target":"Contusion","auc":0.921354},{"family":"A + T","fold":0,"target":"Fracture","auc":0.951583},{"family":"A + T","fold":1,"target":"ACL","auc":0.897379},{"family":"A + T","fold":1,"target":"MCL","auc":0.870585},{"family":"A + T","fold":1,"target":"Medial Meniscus","auc":0.931153},{"family":"A + T","fold":1,"target":"Lateral Meniscus","auc":0.911086},{"family":"A + T","fold":1,"target":"Medial OA","auc":0.914444},{"family":"A + T","fold":1,"target":"Lateral OA","auc":0.892706},{"family":"A + T","fold":1,"target":"PF OA","auc":0.903057},{"family":"A + T","fold":1,"target":"Effusion","auc":0.896648},{"family":"A + T","fold":1,"target":"Synovitis","auc":0.949219},{"family":"A + T","fold":1,"target":"Baker's","auc":0.944267},{"family":"A + T","fold":1,"target":"Contusion","auc":0.923505},{"family":"A + T","fold":1,"target":"Fracture","auc":0.940487},{"family":"A + T","fold":2,"target":"ACL","auc":0.921816},{"family":"A + T","fold":2,"target":"MCL","auc":0.881679},{"family":"A + T","fold":2,"target":"Medial Meniscus","auc":0.919131},{"family":"A + T","fold":2,"target":"Lateral Meniscus","auc":0.895002},{"family":"A + T","fold":2,"target":"Medial OA","auc":0.908415},{"family":"A + T","fold":2,"target":"Lateral OA","auc":0.895178},{"family":"A + T","fold":2,"target":"PF OA","auc":0.913034},{"family":"A + T","fold":2,"target":"Effusion","auc":0.879074},{"family":"A + T","fold":2,"target":"Synovitis","auc":0.914428},{"family":"A + T","fold":2,"target":"Baker's","auc":0.913913},{"family":"A + T","fold":2,"target":"Contusion","auc":0.932245},{"family":"A + T","fold":2,"target":"Fracture","auc":0.924065},{"family":"A + T","fold":3,"target":"ACL","auc":0.925336},{"family":"A + T","fold":3,"target":"MCL","auc":0.847203},{"family":"A + T","fold":3,"target":"Medial Meniscus","auc":0.933478},{"family":"A + T","fold":3,"target":"Lateral Meniscus","auc":0.919886},{"family":"A + T","fold":3,"target":"Medial OA","auc":0.897641},{"family":"A + T","fold":3,"target":"Lateral OA","auc":0.867617},{"family":"A + T","fold":3,"target":"PF OA","auc":0.883216},{"family":"A + T","fold":3,"target":"Effusion","auc":0.880993},{"family":"A + T","fold":3,"target":"Synovitis","auc":0.942368},{"family":"A + T","fold":3,"target":"Baker's","auc":0.950485},{"family":"A + T","fold":3,"target":"Contusion","auc":0.917677},{"family":"A + T","fold":3,"target":"Fracture","auc":0.950171},{"family":"A + T","fold":4,"target":"ACL","auc":0.896549},{"family":"A + T","fold":4,"target":"MCL","auc":0.839071},{"family":"A + T","fold":4,"target":"Medial Meniscus","auc":0.93427},{"family":"A + T","fold":4,"target":"Lateral Meniscus","auc":0.88889},{"family":"A + T","fold":4,"target":"Medial OA","auc":0.925409},{"family":"A + T","fold":4,"target":"Lateral OA","auc":0.867962},{"family":"A + T","fold":4,"target":"PF OA","auc":0.911096},{"family":"A + T","fold":4,"target":"Effusion","auc":0.892252},{"family":"A + T","fold":4,"target":"Synovitis","auc":0.955566},{"family":"A + T","fold":4,"target":"Baker's","auc":0.937206},{"family":"A + T","fold":4,"target":"Contusion","auc":0.912377},{"family":"A + T","fold":4,"target":"Fracture","auc":0.927365},{"family":"F","fold":0,"target":"ACL","auc":0.88154},{"family":"A + T + F","fold":0,"target":"ACL","auc":0.909329},{"family":"F","fold":0,"target":"MCL","auc":0.832044},{"family":"A + T + F","fold":0,"target":"MCL","auc":0.846294},{"family":"F","fold":0,"target":"Medial Meniscus","auc":0.922834},{"family":"A + T + F","fold":0,"target":"Medial Meniscus","auc":0.924482},{"family":"F","fold":0,"target":"Lateral Meniscus","auc":0.872767},{"family":"A + T + F","fold":0,"target":"Lateral Meniscus","auc":0.902539},{"family":"F","fold":0,"target":"Medial OA","auc":0.894788},{"family":"A + T + F","fold":0,"target":"Medial OA","auc":0.909394},{"family":"F","fold":0,"target":"Lateral OA","auc":0.852697},{"family":"A + T + F","fold":0,"target":"Lateral OA","auc":0.87093},{"family":"F","fold":0,"target":"PF OA","auc":0.876418},{"family":"A + T + F","fold":0,"target":"PF OA","auc":0.893748},{"family":"F","fold":0,"target":"Effusion","auc":0.873971},{"family":"A + T + F","fold":0,"target":"Effusion","auc":0.882895},{"family":"F","fold":0,"target":"Synovitis","auc":0.911883},{"family":"A + T + F","fold":0,"target":"Synovitis","auc":0.922897},{"family":"F","fold":0,"target":"Baker's","auc":0.930463},{"family":"A + T + F","fold":0,"target":"Baker's","auc":0.934733},{"family":"F","fold":0,"target":"Contusion","auc":0.91568},{"family":"A + T + F","fold":0,"target":"Contusion","auc":0.924644},{"family":"F","fold":0,"target":"Fracture","auc":0.958802},{"family":"A + T + F","fold":0,"target":"Fracture","auc":0.961576},{"family":"F","fold":1,"target":"ACL","auc":0.872839},{"family":"A + T + F","fold":1,"target":"ACL","auc":0.89483},{"family":"F","fold":1,"target":"MCL","auc":0.862209},{"family":"A + T + F","fold":1,"target":"MCL","auc":0.875924},{"family":"F","fold":1,"target":"Medial Meniscus","auc":0.932059},{"family":"A + T + F","fold":1,"target":"Medial Meniscus","auc":0.934684},{"family":"F","fold":1,"target":"Lateral Meniscus","auc":0.897042},{"family":"A + T + F","fold":1,"target":"Lateral Meniscus","auc":0.911622},{"family":"F","fold":1,"target":"Medial OA","auc":0.909109},{"family":"A + T + F","fold":1,"target":"Medial OA","auc":0.915573},{"family":"F","fold":1,"target":"Lateral OA","auc":0.885102},{"family":"A + T + F","fold":1,"target":"Lateral OA","auc":0.895005},{"family":"F","fold":1,"target":"PF OA","auc":0.878289},{"family":"A + T + F","fold":1,"target":"PF OA","auc":0.901149},{"family":"F","fold":1,"target":"Effusion","auc":0.892648},{"family":"A + T + F","fold":1,"target":"Effusion","auc":0.900734},{"family":"F","fold":1,"target":"Synovitis","auc":0.947716},{"family":"A + T + F","fold":1,"target":"Synovitis","auc":0.952825},{"family":"F","fold":1,"target":"Baker's","auc":0.939691},{"family":"A + T + F","fold":1,"target":"Baker's","auc":0.946349},{"family":"F","fold":1,"target":"Contusion","auc":0.913399},{"family":"A + T + F","fold":1,"target":"Contusion","auc":0.926083},{"family":"F","fold":1,"target":"Fracture","auc":0.940059},{"family":"A + T + F","fold":1,"target":"Fracture","auc":0.951397},{"family":"Z","fold":0,"target":"ACL","auc":0.901454},{"family":"Z","fold":0,"target":"MCL","auc":0.825402},{"family":"Z","fold":0,"target":"Medial Meniscus","auc":0.920711},{"family":"Z","fold":0,"target":"Lateral Meniscus","auc":0.88383},{"family":"Z","fold":0,"target":"Medial OA","auc":0.899029},{"family":"Z","fold":0,"target":"Lateral OA","auc":0.854945},{"family":"Z","fold":0,"target":"PF OA","auc":0.871932},{"family":"Z","fold":0,"target":"Effusion","auc":0.868154},{"family":"Z","fold":0,"target":"Synovitis","auc":0.909212},{"family":"Z","fold":0,"target":"Baker's","auc":0.931788},{"family":"Z","fold":0,"target":"Contusion","auc":0.91602},{"family":"Z","fold":0,"target":"Fracture","auc":0.928292},{"family":"Z","fold":1,"target":"ACL","auc":0.888782},{"family":"Z","fold":1,"target":"MCL","auc":0.858343},{"family":"Z","fold":1,"target":"Medial Meniscus","auc":0.930562},{"family":"Z","fold":1,"target":"Lateral Meniscus","auc":0.908067},{"family":"Z","fold":1,"target":"Medial OA","auc":0.904427},{"family":"Z","fold":1,"target":"Lateral OA","auc":0.892134},{"family":"Z","fold":1,"target":"PF OA","auc":0.891746},{"family":"Z","fold":1,"target":"Effusion","auc":0.894717},{"family":"Z","fold":1,"target":"Synovitis","auc":0.947115},{"family":"Z","fold":1,"target":"Baker's","auc":0.932663},{"family":"Z","fold":1,"target":"Contusion","auc":0.911099},{"family":"Z","fold":1,"target":"Fracture","auc":0.919779}],"resid":[{"pair":"F vs A","fold":0,"target":"ACL","rho":0.883643},{"pair":"F vs A","fold":0,"target":"MCL","rho":0.8537},{"pair":"F vs A","fold":0,"target":"Medial Meniscus","rho":0.967765},{"pair":"F vs A","fold":0,"target":"Lateral Meniscus","rho":0.883083},{"pair":"F vs A","fold":0,"target":"Medial OA","rho":0.97065},{"pair":"F vs A","fold":0,"target":"Lateral OA","rho":0.946714},{"pair":"F vs A","fold":0,"target":"PF OA","rho":0.965016},{"pair":"F vs A","fold":0,"target":"Effusion","rho":0.970461},{"pair":"F vs A","fold":0,"target":"Synovitis","rho":0.946454},{"pair":"F vs A","fold":0,"target":"Baker's","rho":0.952972},{"pair":"F vs A","fold":0,"target":"Contusion","rho":0.92305},{"pair":"F vs A","fold":0,"target":"Fracture","rho":0.794962},{"pair":"F vs A","fold":1,"target":"ACL","rho":0.903144},{"pair":"F vs A","fold":1,"target":"MCL","rho":0.856713},{"pair":"F vs A","fold":1,"target":"Medial Meniscus","rho":0.958442},{"pair":"F vs A","fold":1,"target":"Lateral Meniscus","rho":0.906328},{"pair":"F vs A","fold":1,"target":"Medial OA","rho":0.969298},{"pair":"F vs A","fold":1,"target":"Lateral OA","rho":0.945409},{"pair":"F vs A","fold":1,"target":"PF OA","rho":0.967363},{"pair":"F vs A","fold":1,"target":"Effusion","rho":0.970836},{"pair":"F vs A","fold":1,"target":"Synovitis","rho":0.960279},{"pair":"F vs A","fold":1,"target":"Baker's","rho":0.952604},{"pair":"F vs A","fold":1,"target":"Contusion","rho":0.94247},{"pair":"F vs A","fold":1,"target":"Fracture","rho":0.817388},{"pair":"G vs A","fold":0,"target":"ACL","rho":0.804138},{"pair":"G vs A","fold":0,"target":"MCL","rho":0.828356},{"pair":"G vs A","fold":0,"target":"Medial Meniscus","rho":0.883669},{"pair":"G vs A","fold":0,"target":"Lateral Meniscus","rho":0.836805},{"pair":"G vs A","fold":0,"target":"Medial OA","rho":0.899881},{"pair":"G vs A","fold":0,"target":"Lateral OA","rho":0.886519},{"pair":"G vs A","fold":0,"target":"PF OA","rho":0.874274},{"pair":"G vs A","fold":0,"target":"Effusion","rho":0.888502},{"pair":"G vs A","fold":0,"target":"Synovitis","rho":0.912257},{"pair":"G vs A","fold":0,"target":"Baker's","rho":0.859547},{"pair":"G vs A","fold":0,"target":"Contusion","rho":0.888845},{"pair":"G vs A","fold":0,"target":"Fracture","rho":0.782839},{"pair":"G vs A","fold":1,"target":"ACL","rho":0.80667},{"pair":"G vs A","fold":1,"target":"MCL","rho":0.825811},{"pair":"G vs A","fold":1,"target":"Medial Meniscus","rho":0.866179},{"pair":"G vs A","fold":1,"target":"Lateral Meniscus","rho":0.810889},{"pair":"G vs A","fold":1,"target":"Medial OA","rho":0.885667},{"pair":"G vs A","fold":1,"target":"Lateral OA","rho":0.861291},{"pair":"G vs A","fold":1,"target":"PF OA","rho":0.847831},{"pair":"G vs A","fold":1,"target":"Effusion","rho":0.886582},{"pair":"G vs A","fold":1,"target":"Synovitis","rho":0.893913},{"pair":"G vs A","fold":1,"target":"Baker's","rho":0.870035},{"pair":"G vs A","fold":1,"target":"Contusion","rho":0.866575},{"pair":"G vs A","fold":1,"target":"Fracture","rho":0.799511}],"lb":[{"date":"2026-10-16","label":"Own A + T","score":0.946,"kind":"own"},{"date":"2026-10-16","label":"Public ensemble (earlier version)","score":0.956,"kind":"pub"},{"date":"2026-10-16","label":"Earlier public + own, w = 0.20","score":0.956,"kind":"pub"},{"date":"2026-10-16","label":"Earlier public + own, w = 0.30","score":0.956,"kind":"pub"},{"date":"2026-10-18","label":"Public ensemble (final base)","score":0.958,"kind":"pub"},{"date":"2026-10-18","label":"Public + own A + T, w = 0.30","score":0.957,"kind":"pub"},{"date":"2026-10-18","label":"Own A + T + F, first attempt","score":null,"kind":"own"},{"date":"2026-10-18","label":"Public + own A + T + F, first attempt","score":null,"kind":"pub"},{"date":"2026-10-19","label":"Own A + T + F, robust inference","score":0.947,"kind":"own","slot":2},{"date":"2026-10-20","label":"Final blend: public + own, w = 0.10","score":0.958,"kind":"pub","slot":1}],"gates":[{"name":"Add F","delta":0.0027037,"thr":0.002,"note":"Gain passed, error-correlation rule failed (0.925 > 0.91); kept by judgement"},{"name":"Add 448 px model","delta":0.001271,"thr":0.002},{"name":"Add second seed","delta":0.0006698,"thr":0.001},{"name":"Replace with G","delta":0.0007904,"thr":0.001},{"name":"Add G","delta":0.0015699,"thr":0.002},{"name":"Replace with Z","delta":-0.0004305,"thr":0.001}]};
+</script>
+<script>
+(()=>{
+const NS='http://www.w3.org/2000/svg';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,attrs={},parent,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e}
+const tip=$('#tip');
+function showTip(ev,html){tip.innerHTML=html;tip.style.opacity=1;moveTip(ev)}
+function moveTip(ev){const x=ev.clientX+14,y=ev.clientY+14;tip.style.left=Math.min(x,innerWidth-tip.offsetWidth-10)+'px';tip.style.top=Math.min(y,innerHeight-tip.offsetHeight-10)+'px'}
+function hideTip(){tip.style.opacity=0}
+function hover(node,html){node.classList.add('hov');node.addEventListener('mouseenter',e=>showTip(e,typeof html==='function'?html():html));node.addEventListener('mousemove',moveTip);node.addEventListener('mouseleave',hideTip)}
+const f3=v=>v.toFixed(3), f4=v=>v.toFixed(4);
+const COL={'A':'var(--c-a)','T':'var(--c-t)','F':'var(--c-f)','A + T':'var(--c-at)','A + T + F':'var(--c-atf)','Z':'var(--c-z)'};
+const TARGETS=['ACL','MCL','Medial Meniscus','Lateral Meniscus','Medial OA','Lateral OA','PF OA','Effusion','Synovitis',"Baker's",'Contusion','Fracture'];
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+
+/* Fig1 label bar */
+(()=>{const s=$('#labelBar');const W=860,x0=20,tot=4407,exp=58;const wE=Math.max(6,W*exp/tot);
+el('text',{x:x0,y:22,class:'svg-m','font-size':12},s,'4,407 TRAINING STUDIES');
+const r1=el('rect',{x:x0,y:34,width:wE,height:40,rx:4,fill:'var(--amber)'},s);hover(r1,'<b>58</b> studies labelled by radiologists (1.3%) — never used for training or selection');
+const r2=el('rect',{x:x0+wE+3,y:34,width:W-wE-3,height:40,rx:4,fill:'var(--teal)',opacity:.85},s);hover(r2,'<b>4,349</b> studies with labels extracted from free-text reports by language models');
+el('text',{x:x0+wE+16,y:59,fill:'#fff','font-size':14,'font-family':'IBM Plex Sans','font-weight':600},s,'report-derived labels · 4,349 studies (98.7%)');
+el('path',{d:`M${x0+wE/2} 78 v14 h30`,stroke:'var(--amber)',fill:'none'},s);
+el('text',{x:x0+wE/2+36,y:96,class:'svg-t','font-size':13},s,'radiologist labels · 58 studies (1.3%) — held out from every decision');})();
+
+/* Fig2 consensus */
+(()=>{const s=$('#consensus');let votes=[1,1,0,1,0,1];
+function draw(){s.innerHTML='';el('text',{x:20,y:24,class:'svg-m','font-size':12},s,'ONE STUDY · FINDING: ACL TEAR');
+votes.forEach((v,i)=>{const y=48+i*31;el('text',{x:20,y:y+5,class:'svg-t','font-size':13},s,'Label set '+(i+1));
+const c=el('circle',{cx:150,cy:y,r:11,fill:v?'var(--teal)':'var(--panel)',stroke:v?'var(--teal)':'var(--muted)','stroke-width':2},s);
+el('text',{x:172,y:y+5,class:'svg-m','font-size':12},s,v?'tear':'no tear');
+c.classList.add('hov');c.addEventListener('click',()=>{votes[i]=1-votes[i];draw()});
+el('path',{d:`M230 ${y} C 320 ${y}, 330 140, 400 140`,stroke:'var(--line)',fill:'none','stroke-width':1.5},s)});
+const m=mean(votes);el('rect',{x:400,y:108,width:150,height:64,rx:10,fill:'var(--panel)',stroke:'var(--teal)'},s);
+el('text',{x:475,y:132,'text-anchor':'middle',class:'svg-m','font-size':11},s,'MEAN OF 6');
+el('text',{x:475,y:160,'text-anchor':'middle',class:'svg-t','font-size':24,'font-family':'Fraunces','font-weight':600},s,m.toFixed(2));
+el('path',{d:'M556 140 h60',stroke:'var(--muted)','stroke-dasharray':'4 4'},s);el('path',{d:'M610 134 l7 6 -7 6',stroke:'var(--muted)',fill:'none'},s);
+el('text',{x:630,y:112,class:'svg-m','font-size':11},s,'SOFT TARGET');
+el('rect',{x:630,y:124,width:240,height:16,rx:8,fill:'var(--teal-soft)'},s);el('rect',{x:630,y:124,width:240*m,height:16,rx:8,fill:'var(--teal)'},s);
+el('text',{x:630,y:166,class:'svg-t','font-size':13},s,m===1?'all sets agree: tear':m===0?'all sets agree: no tear':`${Math.round(m*6)} of 6 say tear → learn ${m.toFixed(2)}, not 1`);
+el('text',{x:630,y:188,class:'svg-m','font-size':11},s,'loss: soft binary cross-entropy');}
+draw();})();
+
+/* Fig3 folds */
+(()=>{const s=$('#folds');const n=[852,852,852,851,851];const x0=120,cw=148,ch=30;
+n.forEach((v,j)=>el('text',{x:x0+j*(cw+6)+cw/2,y:20,'text-anchor':'middle',class:'svg-m','font-size':11},s,`fold ${j} · ${v}`));
+for(let i=0;i<5;i++){const g=el('g',{},s);const y=34+i*40;el('text',{x:0,y:y+20,class:'svg-t','font-size':13},g,`Model ${i+1}`);
+for(let j=0;j<5;j++){const val=i===j;el('rect',{x:x0+j*(cw+6),y,width:cw,height:ch,rx:6,fill:val?'var(--amber)':'var(--teal)',opacity:val?1:.25},g);
+if(val)el('text',{x:x0+j*(cw+6)+cw/2,y:y+20,'text-anchor':'middle',fill:'#fff','font-size':12,'font-family':'IBM Plex Mono'},g,'validate');}
+g.classList.add('hov');g.addEventListener('mouseenter',e=>{$$('g',s).forEach(o=>o.style.opacity=o===g?1:.35);showTip(e,`Model ${i+1}: trains on ${4258-n[i]} studies, validated on fold ${i} (${n[i]})`)});
+g.addEventListener('mousemove',moveTip);g.addEventListener('mouseleave',()=>{$$('g',s).forEach(o=>o.style.opacity=1);hideTip()});}
+el('rect',{x:x0,y:238-12,width:12,height:12,rx:3,fill:'var(--teal)',opacity:.25},s);el('text',{x:x0+18,y:236,class:'svg-m','font-size':11},s,'train');
+el('rect',{x:x0+80,y:238-12,width:12,height:12,rx:3,fill:'var(--amber)'},s);el('text',{x:x0+98,y:236,class:'svg-m','font-size':11},s,'validate');})();
+
+
+/* Fig stack (schematic part) */
+(()=>{const s=$('#stackFig');const cc=['#d0453c','#2f9b5a','#3a6fc4'];
+[0,1,2].forEach(i=>el('rect',{x:20+i*8,y:20+(2-i)*8,width:90,height:90,rx:8,fill:cc[i],opacity:.18,stroke:cc[i]},s));
+el('text',{x:150,y:62,class:'svg-t','font-size':13},s,'3 slices = 3 channels');el('text',{x:150,y:82,class:'svg-m','font-size':11},s,'(schematic of the step above)');
+el('path',{d:'M350 70 h80',stroke:'var(--muted)','stroke-dasharray':'4 4'},s);el('path',{d:'M424 64 l7 6 -7 6',stroke:'var(--muted)',fill:'none'},s);
+el('rect',{x:450,y:36,width:170,height:68,rx:10,fill:'var(--panel)',stroke:'var(--line)'},s);
+el('text',{x:535,y:64,'text-anchor':'middle',class:'svg-t','font-size':13},s,'2D backbone');el('text',{x:535,y:84,'text-anchor':'middle',class:'svg-m','font-size':11},s,'→ one feature vector');
+el('path',{d:'M630 70 h60',stroke:'var(--muted)','stroke-dasharray':'4 4'},s);el('path',{d:'M684 64 l7 6 -7 6',stroke:'var(--muted)',fill:'none'},s);
+el('text',{x:705,y:66,class:'svg-t','font-size':13},s,'repeat for every z');el('text',{x:705,y:86,class:'svg-m','font-size':11},s,'up to 86 stacks / study');})();
+
+/* Fig6 attention */
+(()=>{const s=$('#attFig');const slots=[['SAG fluid',8],['SAG other',6],['COR fluid',7],['COR other',5],['AXIAL',6]];
+const N=slots.reduce((a,b)=>a+b[1],0);
+const P={acl:[0,0,.2,.9,1,.6,.1,0, 0,.1,.5,.4,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0, 0,0,0,.1,0,0],
+moa:[0,0,0,0,0,0,0,0, 0,0,0,0,0,0, .3,.6,.8,.7,.5,.3,.1, .2,.5,.6,.4,.1, 0,0,0,0,0,0],
+eff:[.2,.4,.5,.5,.4,.3,.2,.1, 0,.1,.2,.1,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0, .3,.5,.7,.6,.4,.2],
+frx:[0,0,0,0,0,.9,0,0, 0,0,0,0,0,0, 0,0,.1,0,0,0,.95, 0,0,0,0,0, 0,.2,0,0,0,0]};
+const x0=20,W=860,bw=W/N;let rects=[];
+let k=0;slots.forEach(([nm,c],si)=>{const xs=x0+k*bw;el('rect',{x:xs+1,y:20,width:c*bw-2,height:24,rx:6,fill:si%2?'var(--plum-soft)':'var(--teal-soft)'},s);
+el('text',{x:xs+c*bw/2,y:36,'text-anchor':'middle',class:'svg-m','font-size':11},s,nm);k+=c;});
+for(let i=0;i<N;i++){el('rect',{x:x0+i*bw+3,y:60,width:bw-6,height:150,rx:3,fill:'var(--line)',opacity:.35},s);
+const r=el('rect',{x:x0+i*bw+3,y:210,width:bw-6,height:0,rx:3,fill:'var(--teal)'},s);r.style.transition='y .5s ease, height .5s ease';rects.push(r);}
+el('text',{x:x0,y:236,class:'svg-m','font-size':11},s,'each bar = one 3-slice stack · height = attention weight');
+function set(key){const raw=P[key].map(v=>v+.02),sum=raw.reduce((a,b)=>a+b,0);rects.forEach((r,i)=>{const h=raw[i]/Math.max(...raw)*146;r.setAttribute('y',210-h);r.setAttribute('height',h)})}
+$$('[data-att]').forEach(b=>b.addEventListener('click',()=>{$$('[data-att]').forEach(o=>o.classList.toggle('on',o===b));set(b.dataset.att)}));
+set('acl');})();
+
+/* Fig7 TTA */
+(()=>{const s=$('#ttaFig');el('text',{x:20,y:22,class:'svg-m','font-size':11},s,'SAGITTAL · REVERSE SLICE ORDER (REAL SLICES)');
+const ch=['z−1','z','z+1'],cc=['#d0453c','#2f9b5a','#3a6fc4'],src=['slice_zm1','slice_z','slice_zp1'],S=96,G=10;
+ch.forEach((l,i)=>{[[i,40],[2-i,190]].forEach(([k,y])=>{const x=20+i*(S+G);el('image',{href:'assets/kneemri/'+src[k]+'.png',x,y,width:S,height:S,preserveAspectRatio:'xMidYMid meet'},s);el('rect',{x,y:y-5,width:S,height:4,rx:2,fill:cc[k]},s);el('text',{x:x+S/2,y:y+S+16,'text-anchor':'middle',class:'svg-m','font-size':11},s,ch[k])})});
+el('path',{d:'M164 158 v26',stroke:'var(--muted)','stroke-dasharray':'4 4'},s);el('text',{x:174,y:176,class:'svg-m','font-size':11},s,'mirror = reverse order');
+el('text',{x:20,y:318,class:'svg-m','font-size':11},s,'medial ↔ lateral is the slice direction · images shown unmodified');
+const X=480;el('text',{x:X,y:22,class:'svg-m','font-size':11},s,'CORONAL / AXIAL · HORIZONTAL FLIP (REAL CORONAL)');
+[['coronal_sq',40,'original'],['coronal_sq_flip',190,'flipped left ↔ right']].forEach(([f,y,l])=>{el('image',{href:'assets/commons/'+f+'.png',x:X,y,width:110,height:110},s);el('text',{x:X+122,y:y+60,class:'svg-m','font-size':11},s,l)});
+el('path',{d:`M${X+55} 156 v28`,stroke:'var(--muted)','stroke-dasharray':'4 4'},s);el('text',{x:X+65,y:176,class:'svg-m','font-size':11},s,'mirror');
+el('text',{x:X+260,y:120,class:'svg-t','font-size':13},s,'final = ½ · (original');el('text',{x:X+260,y:140,class:'svg-t','font-size':13},s,'+ mirrored)');})();
+
+if(!DATA){return}
+const FD=DATA.fold, TD=DATA.target, RD=DATA.resid;
+
+/* Fig8 fold chart */
+(()=>{const s=$('#foldChart'),leg=$('#foldLegend');const fams=['A','T','A + T','F','A + T + F'];const vis=Object.fromEntries(fams.map(f=>[f,true]));
+const m={l:60,r:20,t:16,b:40},W=900-m.l-m.r,H=340-m.t-m.b,y0=.888,y1=.92;const X=i=>m.l+40+i*(W-80)/4,Y=v=>m.t+H-(v-y0)/(y1-y0)*H;
+fams.forEach(f=>{const b=document.createElement('button');b.className='tbtn on';b.innerHTML=`<span class="sw" style="background:${COL[f]}"></span>${f}`;b.onclick=()=>{vis[f]=!vis[f];b.classList.toggle('off',!vis[f]);draw()};leg.appendChild(b)});
+function draw(){s.innerHTML='';const ax=el('g',{class:'ax'},s);
+for(let v=.89;v<=.9201;v+=.005){el('line',{x1:m.l,x2:m.l+W,y1:Y(v),y2:Y(v),'stroke-dasharray':'2 4'},ax);el('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end'},ax,v.toFixed(3))}
+for(let i=0;i<5;i++)el('text',{x:X(i),y:m.t+H+26,'text-anchor':'middle'},ax,'fold '+i);
+fams.filter(f=>vis[f]).forEach(f=>{const pts=FD.filter(d=>d.family===f).sort((a,b)=>a.fold-b.fold);
+el('path',{d:pts.map((p,i)=>(i?'L':'M')+X(p.fold)+' '+Y(p.auc)).join(' '),fill:'none',stroke:COL[f],'stroke-width':f==='A + T + F'?3:2,opacity:.9},s);
+pts.forEach(p=>{const c=el('circle',{cx:X(p.fold),cy:Y(p.auc),r:f==='A + T + F'?6:5,fill:COL[f],stroke:'var(--panel)','stroke-width':2},s);hover(c,`<b>${f}</b> · fold ${p.fold}<br>macro AUC <b>${f4(p.auc)}</b>`)});
+const last=pts[pts.length-1];el('text',{x:X(last.fold)+10,y:Y(last.auc)+4,'font-size':12,'font-family':'IBM Plex Mono',fill:COL[f]},s,f)});}
+draw();})();
+
+/* Fig9 heatmap */
+(()=>{const s=$('#heatmap');const fams=['A','T','A + T','F','A + T + F','Z'];
+const m={l:150,t:40},cw=118,ch=34;const val={};
+TARGETS.forEach(t=>{val[t]={};fams.forEach(f=>{const r=TD.filter(d=>d.family===f&&d.target===t&&d.fold<=1);val[t][f]=r.length?{m:mean(r.map(d=>d.auc)),f:r}:null})});
+fams.forEach((f,j)=>el('text',{x:m.l+j*cw+cw/2,y:24,'text-anchor':'middle','font-size':12,'font-family':'IBM Plex Mono',fill:COL[f]},s,f));
+const lo=.83,hi=.96;
+TARGETS.forEach((t,i)=>{const y=m.t+i*ch;el('text',{x:m.l-12,y:y+ch/2+4,'text-anchor':'end',class:'svg-t','font-size':13},s,t);
+const best=Math.max(...fams.map(f=>val[t][f]?val[t][f].m:0));
+fams.forEach((f,j)=>{const v=val[t][f];if(!v)return;const a=Math.max(.06,Math.min(1,(v.m-lo)/(hi-lo)));
+const r=el('rect',{x:m.l+j*cw+2,y:y+2,width:cw-4,height:ch-4,rx:5,fill:'var(--teal)','fill-opacity':a,stroke:v.m===best?'var(--ink)':'none','stroke-width':2},s);
+el('text',{x:m.l+j*cw+cw/2,y:y+ch/2+4,'text-anchor':'middle','font-size':12,'font-family':'IBM Plex Mono',fill:a>.55?'#fff':'var(--ink)','pointer-events':'none'},s,f3(v.m));
+hover(r,`<b>${t}</b> · ${f}<br>mean <b>${f4(v.m)}</b><br>`+v.f.map(d=>`fold ${d.fold}: ${f4(d.auc)}`).join('<br>'))})});})();
+
+/* Fig10 gain */
+(()=>{const s=$('#gainChart');const g=TARGETS.map(t=>{const a=mean(TD.filter(d=>d.family==='A + T + F'&&d.target===t).map(d=>d.auc)),b=mean(TD.filter(d=>d.family==='A + T'&&d.target===t&&d.fold<=1).map(d=>d.auc));return{t,d:a-b,a,b}}).sort((p,q)=>q.d-p.d);
+const m={l:150,t:20},W=680,ch=32;const mx=Math.max(...g.map(d=>Math.abs(d.d)));const X0=m.l+W*0.15,sc=(W*0.8)/mx;
+const ax=el('g',{class:'ax'},s);el('line',{x1:X0,x2:X0,y1:m.t-6,y2:m.t+g.length*ch},ax);
+g.forEach((d,i)=>{const y=m.t+i*ch;el('text',{x:m.l-12,y:y+ch/2+4,'text-anchor':'end',class:'svg-t','font-size':13},s,d.t);
+const w=d.d*sc;const r=el('rect',{x:w>=0?X0:X0+w,y:y+6,width:Math.abs(w),height:ch-12,rx:4,fill:d.d>=0?'var(--c-f)':'var(--red)'},s);
+el('text',{x:(w>=0?X0+w+8:X0+w-8),y:y+ch/2+4,'text-anchor':w>=0?'start':'end','font-size':12,'font-family':'IBM Plex Mono',fill:'var(--soft)'},s,(d.d>=0?'+':'')+d.d.toFixed(4));
+hover(r,`<b>${d.t}</b><br>A + T: ${f4(d.b)}<br>A + T + F: ${f4(d.a)}<br>change <b>${(d.d>=0?'+':'')+d.d.toFixed(4)}</b>`)});})();
+
+/* Fig11 residual */
+(()=>{const s=$('#residChart');const r=TARGETS.map(t=>({t,F:mean(RD.filter(d=>d.pair==='F vs A'&&d.target===t).map(d=>d.rho)),G:mean(RD.filter(d=>d.pair==='G vs A'&&d.target===t).map(d=>d.rho))})).sort((a,b)=>a.F-b.F);
+const m={l:150,t:34},W=700,ch=32,x0=.75,x1=1;const X=v=>m.l+(v-x0)/(x1-x0)*W;const ax=el('g',{class:'ax'},s);
+for(let v=.75;v<=1.001;v+=.05){el('line',{x1:X(v),x2:X(v),y1:m.t-8,y2:m.t+r.length*ch,'stroke-dasharray':'2 4'},ax);el('text',{x:X(v),y:m.t+r.length*ch+18,'text-anchor':'middle'},ax,v.toFixed(2))}
+el('line',{x1:X(.91),x2:X(.91),y1:m.t-8,y2:m.t+r.length*ch,stroke:'var(--amber)','stroke-width':1.5,'stroke-dasharray':'5 4'},s);
+el('text',{x:X(.91)+6,y:m.t-14,'font-size':11,'font-family':'IBM Plex Mono',fill:'var(--amber)'},s,'0.91 threshold (macro mean)');
+[['F','var(--c-f)'],['G','var(--plum)']].forEach(([k,c],i)=>{el('circle',{cx:m.l+i*80+6,cy:12,r:6,fill:c},s);el('text',{x:m.l+i*80+16,y:16,'font-size':12,'font-family':'IBM Plex Mono',fill:c},s,k+' vs A')});
+r.forEach((d,i)=>{const y=m.t+i*ch+ch/2;el('text',{x:m.l-12,y:y+4,'text-anchor':'end',class:'svg-t','font-size':13},s,d.t);
+el('line',{x1:X(d.G),x2:X(d.F),y1:y,y2:y,stroke:'var(--line)','stroke-width':3},s);
+[['G',d.G,'var(--plum)'],['F',d.F,'var(--c-f)']].forEach(([k,v,c])=>{const p=el('circle',{cx:X(v),cy:y,r:7,fill:c,stroke:'var(--panel)','stroke-width':2},s);hover(p,`<b>${d.t}</b><br>${k} vs A error correlation <b>${f3(v)}</b>`)})});})();
+
+/* Fig12 rank blend */
+(()=>{const ex=[['Study 1',.82,.40],['Study 2',.80,.91],['Study 3',.79,.75],['Study 4',.55,.20],['Study 5',.54,.88],['Study 6',.30,.35]];
+const rk=a=>{const o=a.map((v,i)=>[v,i]).sort((x,y)=>x[0]-y[0]);const r=[];o.forEach(([v,i],k)=>r[i]=(k+1)/a.length);return r};
+const rp=rk(ex.map(e=>e[1])),ro=rk(ex.map(e=>e[2]));const tb=$('#rankTable'),sl=$('#wSlider'),wv=$('#wVal');
+const base=ex.map((e,i)=>i).sort((a,b)=>rp[b]-rp[a]);
+function draw(){const w=+sl.value;wv.textContent='w = '+w.toFixed(2);const sc=ex.map((e,i)=>(1-w)*rp[i]+w*ro[i]);const ord=ex.map((e,i)=>i).sort((a,b)=>sc[b]-sc[a]);
+tb.innerHTML='<thead><tr><th>Position</th><th>Study</th><th>Public prob.</th><th>Own prob.</th><th>Blended rank score</th><th>Move</th></tr></thead><tbody>'+ord.map((i,p)=>{const was=base.indexOf(i),mv=was-p;return `<tr class="${mv?'moved':''}"><td class="num">${p+1}</td><td>${ex[i][0]}</td><td class="num">${ex[i][1].toFixed(2)}</td><td class="num">${ex[i][2].toFixed(2)}</td><td class="num">${sc[i].toFixed(3)}</td><td class="${mv>0?'mv-up':mv<0?'mv-dn':''}">${mv>0?'▲ '+mv:mv<0?'▼ '+(-mv):'—'}</td></tr>`}).join('')+'</tbody>'}
+sl.addEventListener('input',draw);draw();})();
+
+/* Fig13 LB */
+(()=>{const s=$('#lbChart');const L=DATA.lb;const m={l:60,r:20,t:24,b:70},W=900-m.l-m.r,H=340-m.t-m.b,y0=.944,y1=.96;
+const X=i=>m.l+20+i*(W-40)/(L.length-1),Y=v=>m.t+H-(v-y0)/(y1-y0)*H;const ax=el('g',{class:'ax'},s);
+for(let v=.944;v<=.9601;v+=.004){el('line',{x1:m.l,x2:m.l+W,y1:Y(v),y2:Y(v),'stroke-dasharray':'2 4'},ax);el('text',{x:m.l-8,y:Y(v)+4,'text-anchor':'end'},ax,v.toFixed(3))}
+let prevDate='';L.forEach((d,i)=>{if(d.date!==prevDate){el('text',{x:X(i),y:m.t+H+44,'text-anchor':'start'},ax,d.date.slice(5));el('line',{x1:X(i)-8,x2:X(i)-8,y1:m.t,y2:m.t+H+48,'stroke-dasharray':'1 3'},ax);prevDate=d.date}
+el('text',{x:X(i),y:m.t+H+22,'text-anchor':'middle'},ax,'#'+(i+1));
+const c=d.kind==='own'?'var(--teal)':'var(--plum)';
+if(d.score==null){const g=el('g',{},s);const cx=X(i),cy=m.t+H-8;el('path',{d:`M${cx-6} ${cy-6} L${cx+6} ${cy+6} M${cx+6} ${cy-6} L${cx-6} ${cy+6}`,stroke:'var(--red)','stroke-width':3},g);el('rect',{x:cx-10,y:cy-10,width:20,height:20,fill:'transparent'},g);hover(g,`<b>#${i+1}</b> ${d.label}<br>crashed on hidden test set — no score`);return}
+if(d.slot){el('circle',{cx:X(i),cy:Y(d.score),r:13,fill:'none',stroke:c,'stroke-width':2},s);el('text',{x:X(i),y:Y(d.score)-20,'text-anchor':'middle','font-size':11,'font-family':'IBM Plex Mono',fill:c},s,'final '+d.slot)}
+const p=el('circle',{cx:X(i),cy:Y(d.score),r:7,fill:c,stroke:'var(--panel)','stroke-width':2},s);hover(p,`<b>#${i+1}</b> ${d.label}<br>public AUC <b>${d.score.toFixed(3)}</b>`)});
+[['own models only','var(--teal)'],['with public ensemble','var(--plum)']].forEach(([t,c],i)=>{el('circle',{cx:m.l+10+i*190,cy:8,r:6,fill:c},s);el('text',{x:m.l+22+i*190,y:12,'font-size':12,'font-family':'IBM Plex Mono',fill:c},s,t)});})();
+
+/* Fig14 flow */
+(()=>{const s=$('#flowFig');function box(x,y,w,h,t,sub,c='var(--line)',fill='var(--panel)'){el('rect',{x,y,width:w,height:h,rx:10,fill,stroke:c,'stroke-width':1.5},s);el('text',{x:x+w/2,y:y+(sub?h/2-2:h/2+5),'text-anchor':'middle',class:'svg-t','font-size':13,'font-weight':600},s,t);if(sub)el('text',{x:x+w/2,y:y+h/2+15,'text-anchor':'middle',class:'svg-m','font-size':11},s,sub)}
+function arr(d,l,lx,ly){el('path',{d,stroke:'var(--muted)',fill:'none','stroke-width':1.5,'marker-end':'url(#ah)'},s);if(l)el('text',{x:lx,y:ly,class:'svg-m','font-size':11},s,l)}
+const defs=el('defs',{},s);const mk=el('marker',{id:'ah',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto'},defs);el('path',{d:'M0 0 L10 5 L0 10 z',fill:'var(--muted)'},mk);
+box(20,30,170,56,'Forward pass','fold × mirror, fp16');
+box(250,30,150,56,'All finite?','NaN / inf check','var(--amber)','var(--amber-soft)');
+box(470,30,170,56,'Average','into study prediction','var(--teal)','var(--teal-soft)');
+box(250,150,150,56,'Retry in fp32','chunks of 16 stacks');
+box(470,150,170,56,'Finite now?','','var(--amber)','var(--amber-soft)');
+box(470,270,170,56,'Drop F for study','use A + T');
+box(250,270,150,56,'Prevalence','if all own fail');
+box(700,30,180,56,'Validate CSV','rows · targets · finite','var(--teal)');
+box(700,150,180,56,'Atomic write','temp file → rename','var(--teal)','var(--teal-soft)');
+arr('M190 58 H248');arr('M400 58 H468','yes',420,50);arr('M325 86 V148','no',332,122);arr('M400 178 H468');
+arr('M555 150 V88','yes',562,124);arr('M555 206 V268','no',562,242);arr('M470 298 H402','all fail',408,290);
+arr('M640 298 H760 V208');arr('M325 270 V240 H690 V210');arr('M640 58 H698');arr('M790 86 V148');
+})();
+
+/* Fig15 gates */
+(()=>{const s=$('#gateChart');const G=DATA.gates;const m={l:250,t:30},W=560,ch=42;const lo=-.002,hi=.0035;const X=v=>m.l+(v-lo)/(hi-lo)*W;
+const ax=el('g',{class:'ax'},s);for(let v=-.002;v<=.00351;v+=.001){el('line',{x1:X(v),x2:X(v),y1:m.t-6,y2:m.t+G.length*ch,'stroke-dasharray':'2 4'},ax);el('text',{x:X(v),y:m.t+G.length*ch+18,'text-anchor':'middle'},ax,(v>0?'+':'')+v.toFixed(3))}
+el('line',{x1:X(0),x2:X(0),y1:m.t-6,y2:m.t+G.length*ch,stroke:'var(--muted)'},s);
+G.forEach((g,i)=>{const y=m.t+i*ch;el('text',{x:m.l-14,y:y+ch/2+4,'text-anchor':'end',class:'svg-t','font-size':13},s,g.name);
+const pass=g.delta>=g.thr;const c=g.note?'var(--amber)':pass?'var(--teal)':'var(--red)';
+const r=el('rect',{x:Math.min(X(0),X(g.delta)),y:y+10,width:Math.abs(X(g.delta)-X(0)),height:ch-20,rx:4,fill:c,opacity:.85},s);
+el('line',{x1:X(g.thr),x2:X(g.thr),y1:y+4,y2:y+ch-4,stroke:'var(--ink)','stroke-width':3},s);
+el('text',{x:Math.max(X(g.delta),X(g.thr))+10,y:y+ch/2+4,'font-size':12,'font-family':'IBM Plex Mono',fill:c},s,(g.delta>=0?'+':'')+g.delta.toFixed(4)+(g.note?' · kept':' · fail'));
+hover(r,`<b>${g.name}</b><br>gain ${(g.delta>=0?'+':'')+g.delta.toFixed(4)} · needed ${'+'+g.thr.toFixed(3)}`+(g.note?'<br>'+g.note:''))});})();
+
+})();
+/* lightbox */
+(()=>{const lb=document.getElementById('lightbox'),li=lb.querySelector('img');document.querySelectorAll('img.zoom').forEach(i=>{i.style.cursor='zoom-in';i.addEventListener('click',()=>{li.src=i.src;li.alt=i.alt;lb.classList.add('open')})});lb.addEventListener('click',()=>lb.classList.remove('open'));document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open')})})();
+/* page behaviour */
+(()=>{const root=document.documentElement;
+document.getElementById('themeBtn').addEventListener('click',()=>{const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;root.dataset.theme=dark?'light':'dark';try{localStorage.setItem('rsna-theme',root.dataset.theme)}catch(e){}});
+const prog=document.getElementById('progress'),top=document.getElementById('toTop');
+function onScroll(){const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight||1);prog.style.width=(p*100)+'%';top.classList.toggle('show',h.scrollTop>800)}
+addEventListener('scroll',onScroll,{passive:true});onScroll();top.onclick=()=>scrollTo({top:0,behavior:'smooth'});
+const links=[...document.querySelectorAll('nav a')];
+if('IntersectionObserver' in window){
+const o=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.hash==='#'+en.target.id));const act=links.find(a=>a.hash==='#'+en.target.id);if(act&&act.scrollIntoView)act.parentElement.scrollTo({left:act.offsetLeft-80,behavior:'smooth'})}})},{rootMargin:'-30% 0px -60% 0px'});
+document.querySelectorAll('section[id]').forEach(s=>o.observe(s));
+const r=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');r.unobserve(en.target)}}),{rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal').forEach(e=>r.observe(e));
+}else document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in'));
+})();
+</script>
+</body>
+</html>

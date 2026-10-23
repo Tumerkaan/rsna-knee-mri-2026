@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Local responsive review harness</title>
+<style>body{margin:0;background:#d8dfdf;color:#203238;font:14px Arial}header{height:56px;display:flex;align-items:center;justify-content:center;gap:14px}button{padding:8px 13px;cursor:pointer;border:1px solid #9cabab;border-radius:5px;background:white}iframe{display:block;border:0;margin:auto;width:1440px;height:1000px;background:#fff}p{margin:0}button[aria-pressed=true]{background:#006e66;color:white}</style></head>
+<body><header><p>Local CSS viewport test</p><button data-width="1440" aria-pressed="true">Desktop 1440</button><button data-width="768" aria-pressed="false">Tablet 768</button><button data-width="390" aria-pressed="false">Mobile 390</button></header>
+<iframe id="page" title="RSNA project page responsive preview" src="../docs/index.html"></iframe>
+<script>document.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{document.getElementById("page").style.width=b.dataset.width+"px";document.querySelectorAll("button").forEach(v=>v.setAttribute("aria-pressed",String(v===b)));}));</script>
+</body></html>

@@ -1,0 +1,121 @@
+[
+  {
+    "family": "abig",
+    "component": "abig_recipe.py",
+    "source_record": "output/jupyter-notebook/abig-fivefold-20261013/source/abig_fivefold_tools",
+    "source_sha256": "591a047564df65ec6ccd28b069118fb556ad9ff0f91e9aa12a9b7911768d4b00",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "abig",
+    "component": "abig_runtime.py",
+    "source_record": "output/jupyter-notebook/abig-fivefold-20261013/source/abig_fivefold_tools",
+    "source_sha256": "727e7345778b695970f6fd33989cbc073b7a455f4c9a968833c9d96ec5f5b6f2",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "abig",
+    "component": "abig_colab_20261013.py",
+    "source_record": "output/jupyter-notebook/abig-fivefold-20261013/source/abig_fivefold_tools",
+    "source_sha256": "44baf109486ba1b68f6e777d62b3aab99ecfa82398f2a0c25da54861bf9a6794",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "t1",
+    "component": "abig_recipe.py",
+    "source_record": "output/jupyter-notebook/abig-yogun-fold234-20261014/source/t1_tools",
+    "source_sha256": "58cc30e6b7f63ca21048c3aae4e5ddbcf82cf304b913f49e47f03926ec9b0674",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "t1",
+    "component": "abig_runtime.py",
+    "source_record": "output/jupyter-notebook/abig-yogun-fold234-20261014/source/t1_tools",
+    "source_sha256": "5b0828522038785134bb105f446df06820202c0569557b120f8a6481c8b86260",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "t1",
+    "component": "abig_colab_20261013.py",
+    "source_record": "output/jupyter-notebook/abig-yogun-fold234-20261014/source/t1_tools",
+    "source_sha256": "b766cdd76cd853b512576be555acea0644555278c42e746a72fba1f36b8debbd",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "f",
+    "component": "f_family_recipe_20261016.py",
+    "source_record": "output/jupyter-notebook/f-family-20261016/maxvit-fold01-10h-r1/package/f_tools",
+    "source_sha256": "e829e67d7d136a8fb8ce0cde23ffe3311e992f39be9b8327b35d8f296bc739ea",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "f",
+    "component": "f_family_training_20261016.py",
+    "source_record": "output/jupyter-notebook/f-family-20261016/maxvit-fold01-10h-r1/package/f_tools",
+    "source_sha256": "82909a7593d9489daca3560326235b6294930d8b372d681011b66b705b284e0e",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "f",
+    "component": "abig_colab_20261013.py",
+    "source_record": "output/jupyter-notebook/f-family-20261016/maxvit-fold01-10h-r1/package/f_tools",
+    "source_sha256": "14274014255a90dd0606560720bcf11827edd5c328228471cb25fa838ca587f0",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "g",
+    "component": "abig_recipe.py",
+    "source_record": "output/jupyter-notebook/gz-20261020/g-f0/G-Fold0-20261020.ipynb",
+    "source_sha256": "1e87e95dceb663ee0b16e34441b9e39428a407001879f24c407316d5030fb28b",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "g",
+    "component": "abig_runtime.py",
+    "source_record": "output/jupyter-notebook/gz-20261020/g-f0/G-Fold0-20261020.ipynb",
+    "source_sha256": "611c2544c1c2438ff162559eb02d31dafdfd7b250b3acb59cd3f04afe029bbb5",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "g",
+    "component": "abig_colab_20261013.py",
+    "source_record": "output/jupyter-notebook/gz-20261020/g-f0/G-Fold0-20261020.ipynb",
+    "source_sha256": "dfd0a22d6eb32f5bb74cc80f0623891752cea636f89312b7296c75d0a1adb9ee",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "z",
+    "component": "abig_recipe.py",
+    "source_record": "output/jupyter-notebook/gz-20261020/z-f0/Z-Fold0-20261020.ipynb",
+    "source_sha256": "64e17d8620426a0433ec1f3aabda06832630cae4eb73daf4059fa1f642d57258",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "z",
+    "component": "abig_runtime.py",
+    "source_record": "output/jupyter-notebook/gz-20261020/z-f0/Z-Fold0-20261020.ipynb",
+    "source_sha256": "01a27eb55ff5ed96f3d5e6026bfaddd3798d7336d520bf24ea87b5cb479cd6f4",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "z",
+    "component": "abig_colab_20261013.py",
+    "source_record": "output/jupyter-notebook/gz-20261020/z-f0/Z-Fold0-20261020.ipynb",
+    "source_sha256": "05995bcac9e1cdc793eb41781c90cec5a6bcd2ccb1cab2e6bc08876cf6d831ad",
+    "export_note": "Named scientific definitions retained; imports and fold guard adapted; private launchers omitted"
+  },
+  {
+    "family": "shared",
+    "component": "f_robust_20261019.py",
+    "source_record": "tools/f_robust_20261019.py",
+    "source_sha256": "0631737c00e80950e24629c23647629901ac4dab8fb50a0b04c0f65d5347ccd9",
+    "export_note": "Unmodified source"
+  },
+  {
+    "family": "shared",
+    "component": "notebook_error_record.py",
+    "source_record": "tools/notebook_error_record.py",
+    "source_sha256": "c633b520328d296311f5807f61a63000a996a4ca1c9585560769d492274346a9",
+    "export_note": "Unmodified source"
+  }
+]

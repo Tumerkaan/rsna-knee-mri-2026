@@ -1,0 +1,42 @@
+{
+  "batch_cases": 8,
+  "targets": 12,
+  "cohort": 4258,
+  "fold_cases": [
+    852,
+    852,
+    852,
+    851,
+    851
+  ],
+  "seed_base": 20260929,
+  "stored_slices": 96,
+  "stored_mm": 140,
+  "optimizer": "AdamW",
+  "backbone_lr": 0.0002,
+  "head_lr": 0.001,
+  "weight_decay": 0.05,
+  "warmup_fraction": 0.05,
+  "scheduler": "cosine over original total steps",
+  "epoch_reserve_multiplier": 1.3,
+  "tta": "sagittal: reverse 3-slice channels; other planes: width flip",
+  "network_downloads": false,
+  "publication_adapter_gpu_parity": "NOT RUN",
+  "family": "t1",
+  "epochs": 14,
+  "evaluation_weights": "EMA",
+  "milestones": [
+    1,
+    5,
+    10,
+    14
+  ],
+  "train_windows": 48,
+  "stored_pixels": 384,
+  "model_pixels": 320,
+  "backbone": "convnext_small.fb_in22k_ft_in1k",
+  "absolute_wall_cap_seconds": 72000,
+  "ema_decay": 0.999,
+  "slice_jitter_probability": 0.25,
+  "crop": "direct 320 crop within 329 area"
+}

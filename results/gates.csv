@@ -1,0 +1,9 @@
+experiment,metric,value,criterion,original_decision,outcome
+F addition,Two-fold macro delta,0.002703679467,delta>=.002 AND residual<=.91,FAIL,Residual .925364218; post-hoc user override; retained
+A448 addition,Two-fold macro delta,0.00127104141304825,delta>=.002,FAIL,No folds 2-4
+Seed2 addition,Two-fold macro delta,0.000669762228,delta>=.001,FAIL,Not in final
+G replacement,Two-fold macro delta,0.000790423347179936,delta>=.001,FAIL,Not in final
+G addition C2,Two-fold macro delta,0.0015699214516948778,delta>=.002,FAIL,Later .001 change was post-hoc; holdout234 NOT RUN
+Z replacement,Two-fold macro delta,-0.0004304710668019962,delta>=.001,FAIL,Folds2/3 stopped partial; not used
+S6-CC0,Real-data training / OOF,,NOT RUN,USER STOP,253.6 GB transfer and schedule risk; no AUC verdict
+TTA new ablation,A100 AUC re-inference,,NOT RUN,CANCELLED,Sealed anatomical mirror retained
